@@ -5,38 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="66f2fbe2-d00f-4196-a358-65946562d888" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/makarlauncher.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/admin/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/admin/auth.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/admin/controllers/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/admin/controllers/apps.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/admin/controllers/categories.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/admin/controllers/settings.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/admin/models.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/admin/views/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/admin/views/dialogs.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/admin/views/dialogs/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/admin/views/dialogs/app.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/admin/views/dialogs/auth.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/admin/views/dialogs/category.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/admin/views/dialogs/password.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/admin/views/dialogs/settings.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/admin/views/panels.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ui/components/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ui/components/items.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ui/components/menu.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ui/main_window.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/databse.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/helpers.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/launcher_tools.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/style_manager.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/update_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/admin/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/databse.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/helpers.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

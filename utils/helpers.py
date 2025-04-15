@@ -1,22 +1,46 @@
 import os
-import webbrowser
+import sys
+import hashlib
+import secrets
+from typing import Optional
 
-def launch_app(path):
+
+def resource_path(relative_path: str) -> str:
+    """
+    Получение абсолютного пути к ресурсу.
+    Работает как при разработке, так и в собранном приложении (PyInstaller).
+    """
     try:
-        if path.startswith(('http://', 'https://')):
-            webbrowser.open(path)
-        else:
-            os.startfile(path)
-        return True
-    except Exception as e:
-        return str(e)
+        base_path = sys._MEIPASS  # PyInstaller создает временную папку
+    except AttributeError:
+        base_path = os.path.abspath(".")
 
-def validate_image(path):
-    if not path:
-        return True
-    return os.path.exists(path) and path.lower().endswith(('.png', '.jpg', '.jpeg', '.ico'))
+    return os.path.join(base_path, relative_path)
 
-def validate_executable(path):
-    if not path:
+
+def generate_secure_token(length: int = 32) -> str:
+    """Генерация криптографически безопасного токена"""
+    return secrets.token_hex(length)
+
+
+def validate_password(password: str) -> bool:
+    """Проверка сложности пароля"""
+    if len(password) < 8:
         return False
-    return os.path.exists(path) or path.startswith(('http://', 'https://'))
+    # Дополнительные проверки можно добавить здесь
+    return True
+
+
+def get_app_data_dir(app_name: str = "MakarLauncher") -> str:
+    """
+    Возвращает путь к директории данных приложения
+    """
+    if sys.platform == "win32":
+        path = os.path.join(os.getenv('APPDATA'), app_name)
+    elif sys.platform == "darwin":
+        path = os.path.join(os.path.expanduser('~/Library/Application Support'), app_name)
+    else:
+        path = os.path.join(os.path.expanduser('~/.local/share'), app_name)
+
+    os.makedirs(path, exist_ok=True)
+    return path
