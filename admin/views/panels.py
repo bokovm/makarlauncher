@@ -257,14 +257,24 @@ class AdminPanel(QWidget):
         try:
             with open(self.settings_file, "r", encoding="utf-8") as file:
                 settings = json.load(file)
+
+            # Проверяем, что загруженные данные — это словарь
+            if not isinstance(settings, dict):
+                raise ValueError("Формат файла настроек должен быть объектом (словарем).")
+
+            # Установка значений из настроек
             self.bg_image_input.setText(settings.get("background_image", ""))
             bg_color = settings.get("background_color", "#FFFFFF")
             self.bg_color_preview.setStyleSheet(f"background-color: {bg_color};")
             self.bg_color_preview.color = bg_color
             self.opacity_slider.setValue(int(settings.get("opacity", 0.9) * 100))
             self.font_combo.setCurrentText(settings.get("font_family", "Arial"))
-        except (FileNotFoundError, json.JSONDecodeError):
-            QMessageBox.warning(self, "Ошибка", "Не удалось загрузить настройки!")
+        except FileNotFoundError:
+            QMessageBox.warning(self, "Ошибка", "Файл настроек не найден!")
+        except json.JSONDecodeError:
+            QMessageBox.critical(self, "Ошибка", "Файл настроек имеет неверный формат JSON!")
+        except ValueError as e:
+            QMessageBox.critical(self, "Ошибка", f"Ошибка в данных настроек: {e}")
 
     def save_settings(self):
         """Сохранение настроек в JSON"""

@@ -1,1 +1,5 @@
-[]
+{
+    "background_image": "assets/background.jpg",
+    "theme": "light",
+    "other_settings": {}
+}
