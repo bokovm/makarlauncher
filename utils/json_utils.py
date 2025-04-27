@@ -4,8 +4,26 @@ import re
 import secrets
 import sys
 import json
-from typing import Any
+from typing import Any, List, Dict
 
+from PyQt6.QtWidgets import QMessageBox
+
+
+# В utils/json_manager.py добавьте:
+def load_data(filename: str) -> List[Dict[str, Any]]:
+    try:
+        filepath = os.path.join("data", filename)
+        if os.path.exists(filepath):
+            with open(filepath, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                if not isinstance(data, list):  # Проверка формата
+                    raise ValueError(f"Файл {filename} должен содержать список")
+                return data
+        return []
+    except Exception as e:
+        logging.critical(f"Ошибка загрузки {filename}: {e}")
+        QMessageBox.critical(None, "Ошибка", f"Некорректный формат {filename}")
+        sys.exit(1)
 
 def load_json(file_path: str) -> Any:
     """Загружает данные из JSON-файла."""

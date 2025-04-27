@@ -1,0 +1,30 @@
+2025-04-28 01:53:29,853 - DEBUG - Ресурсный путь: assets/background.jpg -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/background.jpg
+2025-04-28 01:53:30,365 - INFO - Чтение JSON-файла: data/categories.json
+2025-04-28 01:53:30,366 - INFO - Чтение JSON-файла: data/apps.json
+2025-04-28 01:53:30,381 - INFO - Чтение JSON-файла: data/games.json
+2025-04-28 01:53:30,387 - INFO - Чтение JSON-файла: data/sites.json
+2025-04-28 01:53:30,399 - INFO - Чтение JSON-файла: data/chats.json
+2025-04-28 01:53:30,403 - INFO - Чтение JSON-файла: data/settings.json
+2025-04-28 01:53:30,452 - DEBUG - Меню 'main' успешно добавлено
+2025-04-28 01:53:30,457 - DEBUG - Меню 'games' успешно добавлено
+2025-04-28 01:53:30,461 - DEBUG - Меню 'browser' успешно добавлено
+2025-04-28 01:53:30,477 - DEBUG - Меню 'chat' успешно добавлено
+2025-04-28 01:53:30,487 - DEBUG - Меню 'settings' успешно добавлено
+2025-04-28 01:53:30,488 - DEBUG - Ресурсный путь: assets/admin_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/admin_icon.png
+2025-04-28 01:53:30,667 - DEBUG - Ресурсный путь: assets/fullscreen_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/fullscreen_icon.png
+2025-04-28 01:53:30,795 - DEBUG - Переключено на экран: main
+2025-04-28 01:55:22,080 - DEBUG - Ресурсный путь: assets/background.jpg -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/background.jpg
+2025-04-28 01:55:22,231 - INFO - Чтение JSON-файла: data/categories.json
+2025-04-28 01:55:22,232 - INFO - Чтение JSON-файла: data/apps.json
+2025-04-28 01:55:22,247 - INFO - Чтение JSON-файла: data/games.json
+2025-04-28 01:55:22,252 - INFO - Чтение JSON-файла: data/sites.json
+2025-04-28 01:55:22,259 - INFO - Чтение JSON-файла: data/chats.json
+2025-04-28 01:55:22,263 - INFO - Чтение JSON-файла: data/settings.json
+2025-04-28 01:55:22,297 - DEBUG - Меню 'main' успешно добавлено
+2025-04-28 01:55:22,301 - DEBUG - Меню 'games' успешно добавлено
+2025-04-28 01:55:22,305 - DEBUG - Меню 'browser' успешно добавлено
+2025-04-28 01:55:22,313 - DEBUG - Меню 'chat' успешно добавлено
+2025-04-28 01:55:22,315 - DEBUG - Меню 'settings' успешно добавлено
+2025-04-28 01:55:22,315 - DEBUG - Ресурсный путь: assets/admin_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/admin_icon.png
+2025-04-28 01:55:22,329 - DEBUG - Ресурсный путь: assets/fullscreen_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/fullscreen_icon.png
+2025-04-28 01:55:22,348 - DEBUG - Переключено на экран: main

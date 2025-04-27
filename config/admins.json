@@ -1,8 +1,18 @@
 [
     {
+        "username": "makar",
+        "password": "50897118",
+        "salt": "randomsalt123",
+        "is_active": true,
+        "is_admin": false,
+        "created_at": "2023-11-20"
+    },
+    {
         "username": "admin",
         "password": "hashed_password_here",
-        "salt": "salt_here",
-        "is_active": true
+        "salt": "abcd1234efgh5678",
+        "is_active": true,
+        "is_admin": true,
+        "created_at": "2023-11-20"
     }
 ]

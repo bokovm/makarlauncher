@@ -181,15 +181,18 @@ class Launcher(QWidget):
         return QIcon()
 
     def show_admin_auth(self):
-        """Показывает диалог авторизации администратора"""
+        """
+        Показывает диалог авторизации администратора
+        """
         try:
-            if self.admin_panel is None:
-                self.admin_panel = AdminPanel(self)
-                self.stack.addWidget(self.admin_panel)
-                logging.debug("Админ-панель инициализирована")
-
+            # Вызываем авторизацию только здесь
             dialog = AdminLoginDialog(self)
             if dialog.exec() == QDialog.DialogCode.Accepted:
+                if self.admin_panel is None:
+                    self.admin_panel = AdminPanel(self)
+                    self.stack.addWidget(self.admin_panel)
+                    logging.debug("Админ-панель инициализирована")
+
                 self.stack.setCurrentWidget(self.admin_panel)
                 self.admin_button.hide()
                 logging.info("Успешный вход в админ-панель")
@@ -198,8 +201,7 @@ class Launcher(QWidget):
                 QMessageBox.warning(self, "Ошибка", "Неверный пароль администратора")
         except Exception as e:
             logging.error(f"Ошибка при загрузке админ-панели: {e}", exc_info=True)
-            QMessageBox.critical(self, "Ошибка",
-                                 f"Не удалось загрузить админ-панель:\n{str(e)}")
+            QMessageBox.critical(self, "Ошибка", f"Не удалось загрузить админ-панель:\n{str(e)}")
 
     def switch_to(self, screen_name):
         """Переключение между экранами"""

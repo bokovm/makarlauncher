@@ -15,6 +15,11 @@ from .dialogs.auth_manager import AuthManager, RegistrationDialog, LoginDialog
 import os
 
 
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTabWidget, QMessageBox, QDialog
+from .dialogs.auth_manager import AuthManager, RegistrationDialog, LoginDialog
+import os
+
+
 class AdminPanel(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -24,27 +29,17 @@ class AdminPanel(QWidget):
         self.apps_file = os.path.join(self.data_dir, "apps.json")
         self.settings_file = os.path.join(self.data_dir, "settings.json")
 
-        # Проверка авторизации для доступа к админ-панели
-        if not self.authenticate_user():
-            # Если авторизация неуспешна, закрываем админ-панель
-            self.close()
-            return
-
+        # Убираем проверку авторизации из конструктора
         self.init_ui()
 
-    def authenticate_user(self):
-        """Проверяет пользователя и запускает регистрацию или авторизацию."""
-        if not AuthManager.user_exists():
-            # Если пользователь еще не зарегистрирован, запускаем регистрацию
-            registration_dialog = RegistrationDialog(parent=self)
-            if registration_dialog.exec() != QDialog.DialogCode.Accepted:
-                return False
-        else:
-            # Если пользователь уже зарегистрирован, запускаем авторизацию
-            login_dialog = LoginDialog(parent=self)
-            if login_dialog.exec() != QDialog.DialogCode.Accepted:
-                return False
-        return True
+    def check_data_files(self):
+        """Проверяет наличие и корректность файлов данных"""
+        required = ['categories.json', 'apps.json', 'settings.json']
+        for file in required:
+            path = os.path.join("data", file)
+            if not os.path.exists(path):
+                with open(path, "w", encoding="utf-8") as f:
+                    json.dump([] if file != 'settings.json' else {}, f)
 
     def init_ui(self):
         """Инициализация интерфейса админ-панели"""
@@ -52,29 +47,7 @@ class AdminPanel(QWidget):
 
         self.tabs = QTabWidget()
 
-        # Вкладки админ-панели (категории, приложения, настройки)
-        self.categories_tab = QWidget()
-        self.init_categories_tab()
-        self.tabs.addTab(self.categories_tab, "Категории")
-
-        self.apps_tab = QWidget()
-        self.init_apps_tab()
-        self.tabs.addTab(self.apps_tab, "Приложения")
-
-        self.settings_tab = QWidget()
-        self.init_settings_tab()
-        self.tabs.addTab(self.settings_tab, "Настройки")
-
-        layout.addWidget(self.tabs)
-        self.setLayout(layout)
-
-    def init_ui(self):
-        """Инициализация интерфейса админ-панели"""
-        layout = QVBoxLayout()
-
-        self.tabs = QTabWidget()
-
-        # Вкладки админ-панели (категории, приложения, настройки)
+        # Вкладки админ-панели
         self.categories_tab = QWidget()
         self.init_categories_tab()
         self.tabs.addTab(self.categories_tab, "Категории")
