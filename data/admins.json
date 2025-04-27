@@ -1,0 +1,8 @@
+[
+    {
+        "username": "admin",
+        "password": "e99a18c428cb38d5f260853678922e03",
+        "salt": "abcd1234efgh5678ijkl9012mnop3456",
+        "is_active": true
+    }
+]

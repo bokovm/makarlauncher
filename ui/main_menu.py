@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QMessageBox
 from PyQt6.QtCore import Qt
 import os
 from utils.json_utils import load_json
@@ -7,9 +7,9 @@ from utils.json_utils import load_json
 class MainMenu(QWidget):
     def __init__(self, switch_callback, admin_auth_callback):
         """
-        Конструктор для главного меню
-        :param switch_callback: Функция для переключения экранов
-        :param admin_auth_callback: Функция для вызова авторизации администратора
+        Конструктор для главного меню.
+        :param switch_callback: Функция для переключения экранов.
+        :param admin_auth_callback: Функция для вызова авторизации администратора.
         """
         super().__init__()
         self.switch_callback = switch_callback
@@ -17,55 +17,57 @@ class MainMenu(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        """Инициализация пользовательского интерфейса"""
+        """Инициализация пользовательского интерфейса."""
         self.layout = QVBoxLayout()
+        self.layout.setSpacing(15)
+        self.layout.setContentsMargins(20, 20, 20, 20)
         self.setLayout(self.layout)
         self.update_layout()
 
     def update_layout(self):
-        """Обновление интерфейса с категориями и приложениями"""
-        # Очищаем текущий layout
+        """Обновление интерфейса с категориями и приложениями."""
+        # Очищаем текущий layout.
         while self.layout.count():
             child = self.layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
 
-        # Загружаем категории и приложения
-        categories = load_json("data/categories.json")
-        apps = load_json("data/apps.json")
+        # Загружаем категории и приложения.
+        categories = load_json("data/categories.json") or []
+        apps = load_json("data/apps.json") or []
+
+        if not categories:
+            self.show_message("Категории не найдены в JSON-файле.")
+            return
 
         for category in categories:
-            # Добавляем заголовок категории
-            category_label = QLabel(category["name"])
+            # Добавляем заголовок категории.
+            category_label = QLabel(category.get("name", "Без имени"))
             category_label.setStyleSheet("font-size: 20px; color: white; margin-top: 20px;")
             self.layout.addWidget(category_label)
 
-            # Контейнер для приложений в данной категории
+            # Контейнер для приложений в данной категории.
             apps_container = QWidget()
             apps_layout = QHBoxLayout()
+            apps_layout.setSpacing(10)
             apps_container.setLayout(apps_layout)
 
-            for app in filter(lambda x: x["category_id"] == category["id"], apps):
-                app_btn = QPushButton(app["name"])
-                app_btn.setStyleSheet("""
-                    QPushButton {
-                        font-size: 16px;
-                        background-color: #4682B4;
-                        color: white;
-                        padding: 10px;
-                        border-radius: 5px;
-                        border: none;
-                    }
-                    QPushButton:hover {
-                        background-color: #5A9BD5;
-                    }
-                """)
-                app_btn.clicked.connect(lambda _, p=app["path"]: self.launch_app(p))
+            # Фильтруем приложения по категории.
+            category_apps = [app for app in apps if app.get("category_id") == category.get("id")]
+
+            if not category_apps:
+                empty_label = QLabel("(Нет приложений в категории)")
+                empty_label.setStyleSheet("font-size: 14px; color: gray;")
+                self.layout.addWidget(empty_label)
+                continue
+
+            for app in category_apps:
+                app_btn = self.create_app_button(app)
                 apps_layout.addWidget(app_btn)
 
             self.layout.addWidget(apps_container)
 
-        # Кнопка для входа в админ-панель
+        # Кнопка для входа в админ-панель.
         admin_btn = QPushButton("Админ-панель")
         admin_btn.setStyleSheet("""
             QPushButton {
@@ -83,9 +85,57 @@ class MainMenu(QWidget):
         admin_btn.clicked.connect(self.admin_auth_callback)
         self.layout.addWidget(admin_btn)
 
+    def create_app_button(self, app):
+        """
+        Создает кнопку для приложения.
+        :param app: Словарь с данными приложения (name, path, icon_path, bg_color, is_square).
+        :return: QPushButton
+        """
+        app_name = app.get("name", "Без имени")
+        app_path = app.get("path", "")
+        app_icon = app.get("icon_path", "")
+        bg_color = app.get("bg_color", "#4682B4")
+        is_square = app.get("is_square", False)
+
+        app_btn = QPushButton(app_name)
+        app_btn.setToolTip(app_name)
+
+        # Настройка внешнего вида кнопки.
+        app_btn.setStyleSheet(f"""
+            QPushButton {{
+                font-size: 16px;
+                background-color: {bg_color};
+                color: white;
+                padding: 10px;
+                border-radius: {'10px' if is_square else '32px'};
+                border: none;
+            }}
+            QPushButton:hover {{
+                background-color: #5A9BD5;
+            }}
+        """)
+
+        # Обработчик клика.
+        app_btn.clicked.connect(lambda _, p=app_path: self.launch_app(p))
+
+        return app_btn
+
     def launch_app(self, path):
-        """Запуск приложения"""
+        """
+        Запуск приложения.
+        :param path: Путь к приложению.
+        """
         if os.path.exists(path):
-            os.startfile(path)
+            try:
+                os.startfile(path)
+            except Exception as e:
+                self.show_message(f"Не удалось запустить приложение: {str(e)}")
         else:
-            print(f"[ERROR] Приложение не найдено по пути: {path}")
+            self.show_message(f"Приложение не найдено по пути: {path}")
+
+    def show_message(self, message):
+        """
+        Отображение сообщения пользователю.
+        :param message: Текст сообщения.
+        """
+        QMessageBox.information(self, "Информация", message)

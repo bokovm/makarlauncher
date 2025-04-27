@@ -16,30 +16,33 @@ class AdminLoginDialog(QDialog):
     def __init__(self, auth_controller, parent=None):
         super().__init__(parent)
         self.auth_controller = auth_controller
-        self.setWindowTitle("Admin Authorization")
+        self.setWindowTitle("Авторизация администратора")
         self.setFixedSize(350, 220)
         self.setup_ui()
 
     def setup_ui(self):
+        """Инициализация интерфейса"""
         layout = QVBoxLayout()
         layout.setContentsMargins(20, 20, 20, 20)
         layout.setSpacing(15)
 
-        # Элементы интерфейса
-        title = QLabel("Administrator Login")
+        # Заголовок
+        title = QLabel("Вход администратора")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title.setStyleSheet("font-size: 16px; font-weight: bold;")
 
+        # Поля ввода
         self.username_input = QLineEdit()
-        self.username_input.setPlaceholderText("Enter username")
+        self.username_input.setPlaceholderText("Введите имя пользователя")
         self.username_input.setMinimumHeight(35)
 
         self.password_input = QLineEdit()
-        self.password_input.setPlaceholderText("Enter password")
+        self.password_input.setPlaceholderText("Введите пароль")
         self.password_input.setMinimumHeight(35)
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
 
-        self.login_btn = QPushButton("Sign In")
+        # Кнопка входа
+        self.login_btn = QPushButton("Войти")
         self.login_btn.setMinimumHeight(40)
         self.login_btn.setStyleSheet(
             "background-color: #4CAF50; color: white; border: none;"
@@ -47,9 +50,9 @@ class AdminLoginDialog(QDialog):
 
         # Компоновка
         layout.addWidget(title)
-        layout.addWidget(QLabel("Username:"))
+        layout.addWidget(QLabel("Имя пользователя:"))
         layout.addWidget(self.username_input)
-        layout.addWidget(QLabel("Password:"))
+        layout.addWidget(QLabel("Пароль:"))
         layout.addWidget(self.password_input)
         layout.addWidget(self.login_btn)
 
@@ -65,20 +68,20 @@ class AdminLoginDialog(QDialog):
         password = self.password_input.text()
 
         if not username or not password:
-            self.show_error("Please enter both username and password")
+            self.show_error("Введите имя пользователя и пароль.")
             return
 
         if self.auth_controller.authenticate(username, password):
             self.login_success.emit(username)
             self.accept()
         else:
-            self.show_error("Invalid credentials")
+            self.show_error("Неверные учетные данные!")
 
     def show_error(self, message: str):
         """Показать сообщение об ошибке"""
         QMessageBox.warning(
             self,
-            "Authentication Failed",
+            "Ошибка аутентификации",
             message,
             QMessageBox.StandardButton.Ok
         )
@@ -93,8 +96,12 @@ class AuthController:
     def _init_json(self):
         """Инициализация файла JSON для хранения администраторов"""
         admins = load_json(self.json_file)
-        if not admins:
-            # Создание администратора по умолчанию
+        if admins is None:
+            # Если файл отсутствует или пустой, создается администратор по умолчанию
+            admins = []
+            self.create_admin("admin", "admin123")
+        elif not admins:
+            # Если файл пуст (например, "[]"), создается администратор по умолчанию
             self.create_admin("admin", "admin123")
 
     @staticmethod
@@ -118,9 +125,9 @@ class AuthController:
         if not username or not password:
             return False
 
-        admins = load_json(self.json_file)
+        admins = load_json(self.json_file) or []
         if any(admin["username"] == username for admin in admins):
-            return False
+            return False  # Администратор с таким именем уже существует
 
         salt = self._generate_salt()
         hashed_password = self._hash_password(password, salt)
@@ -136,7 +143,7 @@ class AuthController:
 
     def authenticate(self, username: str, password: str) -> bool:
         """Аутентификация администратора"""
-        admins = load_json(self.json_file)
+        admins = load_json(self.json_file) or []
         for admin in admins:
             if admin["username"] == username and admin["is_active"]:
                 salt = admin["salt"]
@@ -150,7 +157,7 @@ class AuthController:
         if not self.authenticate(username, current_password):
             return False
 
-        admins = load_json(self.json_file)
+        admins = load_json(self.json_file) or []
         for admin in admins:
             if admin["username"] == username:
                 salt = self._generate_salt()
@@ -163,7 +170,7 @@ class AuthController:
 
     def get_admin_count(self) -> int:
         """Получение количества активных администраторов"""
-        admins = load_json(self.json_file)
+        admins = load_json(self.json_file) or []
         return sum(1 for admin in admins if admin["is_active"])
 
     def create_login_dialog(self, parent=None) -> AdminLoginDialog:

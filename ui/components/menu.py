@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QLabel, QPushButton,
                              QHBoxLayout, QMessageBox)
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtGui import QIcon
 import sqlite3
 import os
@@ -14,11 +14,15 @@ class MainMenu(QWidget):
         self.init_ui()
 
     def init_ui(self):
+        """Инициализация интерфейса"""
         self.layout = QVBoxLayout()
+        self.layout.setSpacing(15)
+        self.layout.setContentsMargins(20, 20, 20, 20)
         self.setLayout(self.layout)
         self.update_layout()
 
     def update_layout(self):
+        """Обновление интерфейса с категориями и приложениями"""
         # Очищаем текущий layout
         while self.layout.count():
             child = self.layout.takeAt(0)
@@ -36,7 +40,7 @@ class MainMenu(QWidget):
             with sqlite3.connect('launcher.db') as conn:
                 c = conn.cursor()
 
-                # Получаем категории в порядке сортировки
+                # Получаем категории
                 c.execute("SELECT id, name, icon_path FROM categories ORDER BY sort_order")
                 categories = c.fetchall()
 
@@ -45,7 +49,7 @@ class MainMenu(QWidget):
                     return
 
                 for cat_id, cat_name, cat_icon in categories:
-                    # Добавляем категорию
+                    # Добавляем заголовок категории
                     category_label = QLabel(cat_name)
                     category_label.setStyleSheet("font-size: 20px; color: white; margin-top: 20px;")
                     self.layout.addWidget(category_label)
@@ -59,13 +63,17 @@ class MainMenu(QWidget):
                     """, (cat_id,))
                     apps = c.fetchall()
 
+                    # Если в категории нет приложений
                     if not apps:
-                        self.show_message(f"Приложения не найдены для категории: {cat_name}")
+                        empty_label = QLabel(f"(Нет приложений в категории)")
+                        empty_label.setStyleSheet("font-size: 14px; color: gray;")
+                        self.layout.addWidget(empty_label)
                         continue
 
                     # Создаем контейнер для приложений
                     apps_container = QWidget()
                     apps_layout = QHBoxLayout()
+                    apps_layout.setSpacing(10)
                     apps_container.setLayout(apps_layout)
 
                     for app_id, app_name, app_path, app_icon, bg_color, is_square in apps:
@@ -106,7 +114,7 @@ class MainMenu(QWidget):
         if app_icon and os.path.exists(app_icon):
             icon = QIcon(app_icon)
             app_btn.setIcon(icon)
-            app_btn.setIconSize(Qt.QSize(64, 64))
+            app_btn.setIconSize(QSize(64, 64))
 
         app_btn.setStyleSheet(f"""
             QPushButton {{
@@ -135,9 +143,9 @@ class MainMenu(QWidget):
             if os.path.exists(path):
                 os.startfile(path)
             else:
-                raise FileNotFoundError(f"Файл {path} не найден.")
+                QMessageBox.critical(self, "Ошибка", f"Приложение не найдено по пути: {path}")
         except Exception as e:
-            QMessageBox.critical(self, "Ошибка", f"Не удалось запустить приложение:\n{str(e)}")
+            QMessageBox.critical(self, "Ошибка", f"Не удалось запустить приложение:\n{e}")
 
     def show_message(self, message):
         """Отображение сообщения"""
