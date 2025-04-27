@@ -41,6 +41,11 @@ class AuthManager:
             AuthManager.hash_password(password) == user_data["password"]
         )
 
+    @staticmethod
+    def user_exists():
+        """Проверяет, существует ли пользователь."""
+        return os.path.exists(USER_DATA_FILE)
+
 
 class RegistrationDialog(QDialog):
     """Диалог для регистрации нового пользователя."""

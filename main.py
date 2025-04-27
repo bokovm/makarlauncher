@@ -1,20 +1,20 @@
 import logging
+import sys
 
 from PyQt6.QtWidgets import QApplication, QStackedWidget
 from core.launcher import Launcher
-import sys
 
 
 def main():
+    logging.basicConfig(level=logging.INFO)
     logging.info("Инициализация приложения началась...")
-    """Главная функция для запуска приложения"""
-    print("Инициализация приложения...")
+
     app = QApplication(sys.argv)
 
-    # Создаём стек виджетов
+    # Создаем стек виджетов
     stacked_widget = QStackedWidget()
 
-    # Передаём stacked_widget в Launcher
+    # Передаем stacked_widget в Launcher
     logging.info("Создание экземпляра Launcher...")
     launcher = Launcher(stacked_widget)
 
@@ -23,13 +23,11 @@ def main():
 
     logging.info("Приложение успешно инициализировано.")
 
-    # Отображаем окно
+    # Отображаем главное окно
     stacked_widget.show()
 
     sys.exit(app.exec())
 
-    app.exec()
-    logging.info("Приложение завершено.")
 
 if __name__ == "__main__":
     main()
