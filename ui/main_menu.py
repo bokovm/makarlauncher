@@ -1,80 +1,91 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QHBoxLayout
-from PyQt6.QtGui import QFont
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
 from PyQt6.QtCore import Qt
+import os
+from utils.json_utils import load_json
+
 
 class MainMenu(QWidget):
-    def __init__(self, switch_to, show_admin_auth):
+    def __init__(self, switch_callback, admin_auth_callback):
+        """
+        Конструктор для главного меню
+        :param switch_callback: Функция для переключения экранов
+        :param admin_auth_callback: Функция для вызова авторизации администратора
+        """
         super().__init__()
-        self.switch_to = switch_to
-        self.show_admin_auth = show_admin_auth
+        self.switch_callback = switch_callback
+        self.admin_auth_callback = admin_auth_callback
         self.init_ui()
 
     def init_ui(self):
-        layout = QVBoxLayout()
-        layout.setSpacing(20)
-        layout.setContentsMargins(50, 50, 50, 50)
+        """Инициализация пользовательского интерфейса"""
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
+        self.update_layout()
 
-        # Заголовок
-        title = QLabel("Главное меню")
-        title.setStyleSheet("""
-            QLabel {
-                color: white;
-                font-size: 28px;
-                font-weight: bold;
-                qproperty-alignment: AlignCenter;
-            }
-        """)
-        layout.addWidget(title)
+    def update_layout(self):
+        """Обновление интерфейса с категориями и приложениями"""
+        # Очищаем текущий layout
+        while self.layout.count():
+            child = self.layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
 
-        # Стиль для кнопок
-        button_style = """
-            QPushButton {
-                background-color: rgba(70, 130, 180, 0.85);
-                color: white;
-                font-size: 20px;
-                padding: 15px;
-                border-radius: 10px;
-                border: 2px solid #4682B4;
-                min-width: 250px;
-            }
-            QPushButton:hover {
-                background-color: rgba(90, 150, 200, 0.9);
-            }
-        """
+        # Загружаем категории и приложения
+        categories = load_json("data/categories.json")
+        apps = load_json("data/apps.json")
 
-        # Кнопки меню
-        buttons = [
-            ("Игры", "games"),
-            ("Браузер", "browser"),
-            ("Общение", "chat"),
-            ("Настройки", "settings"),
-        ]
+        for category in categories:
+            # Добавляем заголовок категории
+            category_label = QLabel(category["name"])
+            category_label.setStyleSheet("font-size: 20px; color: white; margin-top: 20px;")
+            self.layout.addWidget(category_label)
 
-        for label, screen in buttons:
-            btn = QPushButton(label)
-            btn.setStyleSheet(button_style)
-            btn.clicked.connect(lambda _, s=screen: self.switch_to(s))
-            layout.addWidget(btn)
+            # Контейнер для приложений в данной категории
+            apps_container = QWidget()
+            apps_layout = QHBoxLayout()
+            apps_container.setLayout(apps_layout)
 
-        # Кнопка админ-панели (только для авторизованных пользователей)
+            for app in filter(lambda x: x["category_id"] == category["id"], apps):
+                app_btn = QPushButton(app["name"])
+                app_btn.setStyleSheet("""
+                    QPushButton {
+                        font-size: 16px;
+                        background-color: #4682B4;
+                        color: white;
+                        padding: 10px;
+                        border-radius: 5px;
+                        border: none;
+                    }
+                    QPushButton:hover {
+                        background-color: #5A9BD5;
+                    }
+                """)
+                app_btn.clicked.connect(lambda _, p=app["path"]: self.launch_app(p))
+                apps_layout.addWidget(app_btn)
+
+            self.layout.addWidget(apps_container)
+
+        # Кнопка для входа в админ-панель
         admin_btn = QPushButton("Админ-панель")
         admin_btn.setStyleSheet("""
             QPushButton {
-                background-color: rgba(180, 70, 70, 0.85);
+                font-size: 16px;
+                background-color: #4CAF50;
                 color: white;
-                font-size: 20px;
-                padding: 15px;
-                border-radius: 10px;
-                border: 2px solid #B44646;
-                min-width: 250px;
-                margin-top: 30px;
+                padding: 10px;
+                border-radius: 5px;
+                border: none;
             }
             QPushButton:hover {
-                background-color: rgba(200, 90, 90, 0.9);
+                background-color: #45A049;
             }
         """)
-        admin_btn.clicked.connect(self.show_admin_auth)
-        layout.addWidget(admin_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        admin_btn.clicked.connect(self.admin_auth_callback)
+        self.layout.addWidget(admin_btn)
 
-        layout.addStretch()
-        self.setLayout(layout)
+    def launch_app(self, path):
+        """Запуск приложения"""
+        if os.path.exists(path):
+            os.startfile(path)
+        else:
+            print(f"[ERROR] Приложение не найдено по пути: {path}")

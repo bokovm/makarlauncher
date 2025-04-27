@@ -1,0 +1,8 @@
+[
+    {
+        "username": "admin",
+        "password": "hashed_password_here",
+        "salt": "salt_here",
+        "is_active": true
+    }
+]

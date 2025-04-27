@@ -1,68 +1,53 @@
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QLabel,
-                             QMessageBox, QHBoxLayout)
-from PyQt6.QtGui import QFont, QIcon
+                             QMessageBox, QHBoxLayout, QSizePolicy)
+from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt, QSize
-import subprocess
 import os
-import sqlite3
-from admin.views.dialogs.app import AppEditor  # Для редактирования игр
-
+import subprocess
+from utils.json_utils import load_json, save_json
 
 class GamesMenu(QWidget):
     def __init__(self, switch_to, is_admin=False):
         super().__init__()
         self.switch_to = switch_to
-        self.is_admin = is_admin  # Флаг администратора
+        self.is_admin = is_admin
+        self.games_file = "data/games.json"  # Путь к JSON файлу с играми
         self.init_ui()
-        self.load_games_from_db()  # Загрузка игр из БД
+        self.load_games()
 
     def init_ui(self):
+        """Инициализация пользовательского интерфейса"""
+        self.setStyleSheet("background-color: #2b2b2b;")
         self.layout = QVBoxLayout()
         self.layout.setSpacing(20)
-        self.layout.setContentsMargins(50, 50, 50, 50)
+        self.layout.setContentsMargins(30, 30, 30, 30)
 
-        # Стили для элементов
-        self.title_style = """
+        # Заголовок
+        title = QLabel("Игры")
+        title.setStyleSheet("""
             QLabel {
                 color: white;
                 font-size: 28px;
                 font-weight: bold;
                 qproperty-alignment: AlignCenter;
             }
-        """
+        """)
+        self.layout.addWidget(title)
 
-        self.game_button_style = """
-            QPushButton {
-                background-color: rgba(75, 150, 200, 0.85);
-                color: white;
-                font-size: 18px;
-                padding: 15px;
-                border-radius: 8px;
-                border: 2px solid #4B96C8;
-                min-width: 300px;
-            }
-            QPushButton:hover {
-                background-color: rgba(95, 170, 220, 0.9);
-            }
-        """
+        # Контейнер для списка игр
+        self.games_container = QWidget()
+        self.games_container.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding
+        )
+        self.games_layout = QVBoxLayout()
+        self.games_layout.setSpacing(15)
+        self.games_container.setLayout(self.games_layout)
+        self.layout.addWidget(self.games_container)
 
-        self.admin_button_style = """
-            QPushButton {
-                background-color: rgba(180, 180, 50, 0.85);
-                color: white;
-                font-size: 14px;
-                padding: 5px;
-                border-radius: 5px;
-                border: 1px solid #B4B432;
-                min-width: 30px;
-                max-width: 30px;
-            }
-            QPushButton:hover {
-                background-color: rgba(200, 200, 70, 0.9);
-            }
-        """
-
-        self.back_button_style = """
+        # Кнопка "Назад"
+        back_btn = QPushButton("Назад")
+        back_btn.setStyleSheet("""
             QPushButton {
                 background-color: rgba(200, 80, 80, 0.85);
                 color: white;
@@ -75,150 +60,154 @@ class GamesMenu(QWidget):
             QPushButton:hover {
                 background-color: rgba(220, 100, 100, 0.9);
             }
-        """
-
-        # Заголовок
-        title = QLabel("Игры")
-        title.setStyleSheet(self.title_style)
-        self.layout.addWidget(title)
-
-        # Контейнер для списка игр
-        self.games_container = QWidget()
-        self.games_layout = QVBoxLayout()
-        self.games_container.setLayout(self.games_layout)
-        self.layout.addWidget(self.games_container)
-
-        # Кнопка "Назад"
-        back_btn = QPushButton("Назад")
-        back_btn.setStyleSheet(self.back_button_style)
+        """)
         back_btn.clicked.connect(lambda: self.switch_to("main"))
         self.layout.addWidget(back_btn)
 
-        # Кнопка "Добавить игру" (только для админа)
+        # Кнопка "Добавить игру" (для админа)
         if self.is_admin:
             add_btn = QPushButton("Добавить игру")
-            add_btn.setStyleSheet(self.game_button_style)
+            add_btn.setStyleSheet("""
+                QPushButton {
+                    background-color: rgba(75, 150, 200, 0.85);
+                    color: white;
+                    font-size: 18px;
+                    padding: 15px;
+                    border-radius: 8px;
+                    border: 2px solid #4B96C8;
+                    min-width: 300px;
+                }
+                QPushButton:hover {
+                    background-color: rgba(95, 170, 220, 0.9);
+                }
+            """)
             add_btn.clicked.connect(self.add_game)
             self.layout.addWidget(add_btn)
 
         self.setLayout(self.layout)
 
-    def load_games_from_db(self):
-        """Загрузка игр из базы данных"""
-        conn = sqlite3.connect('launcher.db')
-        c = conn.cursor()
+    def load_games(self):
+        """Загрузка списка игр из JSON файла"""
+        self.clear_games_layout()
+        games = load_json(self.games_file)
 
-        # Получаем игры из категории "Игры" (category_id=1)
-        c.execute("""SELECT id, name, path, icon_path FROM apps 
-                     WHERE category_id=1 ORDER BY name""")
-        games = c.fetchall()
-        conn.close()
+        if not games:
+            self.show_no_games_message()
+            return
 
-        # Очищаем текущий список
-        for i in reversed(range(self.games_layout.count())):
-            self.games_layout.itemAt(i).widget().setParent(None)
+        for game in games:
+            self.add_game_button(game)
 
-        # Добавляем игры
-        for game_id, name, path, icon_path in games:
-            self.add_game_button(game_id, name, path, icon_path)
+    def clear_games_layout(self):
+        """Очистка layout с играми"""
+        while self.games_layout.count():
+            item = self.games_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
 
-    def add_game_button(self, game_id, name, path, icon_path=None):
-        """Добавляет кнопку игры в интерфейс"""
+    def show_no_games_message(self):
+        """Показать сообщение об отсутствии игр"""
+        label = QLabel("Игры не найдены")
+        label.setStyleSheet("color: white; font-size: 16px;")
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.games_layout.addWidget(label)
+
+    def add_game_button(self, game):
+        """Добавление кнопки игры в интерфейс"""
         btn_layout = QHBoxLayout()
+        btn_layout.setSpacing(10)
 
-        # Основная кнопка игры
-        game_btn = QPushButton(name)
-        game_btn.setStyleSheet(self.game_button_style)
+        # Кнопка игры
+        game_btn = QPushButton(game['name'])
+        game_btn.setStyleSheet("""
+            QPushButton {
+                background-color: rgba(75, 150, 200, 0.85);
+                color: white;
+                font-size: 18px;
+                padding: 15px;
+                border-radius: 8px;
+                border: 2px solid #4B96C8;
+                min-width: 300px;
+                text-align: left;
+            }
+            QPushButton:hover {
+                background-color: rgba(95, 170, 220, 0.9);
+            }
+        """)
+        game_btn.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Preferred
+        )
 
-        if icon_path and os.path.exists(icon_path):
-            game_btn.setIcon(QIcon(icon_path))
+        # Установка иконки если она существует
+        if game.get("icon_path") and os.path.exists(game["icon_path"]):
+            game_btn.setIcon(QIcon(game["icon_path"]))
             game_btn.setIconSize(QSize(32, 32))
 
-        game_btn.clicked.connect(lambda _, p=path, n=name: self.launch_game(p, n))
+        game_btn.clicked.connect(lambda _, p=game["path"]: self.launch_game(p))
         btn_layout.addWidget(game_btn)
 
-        # Кнопки редактирования (только для админа)
+        # Кнопки управления для админа
         if self.is_admin:
-            edit_btn = QPushButton("✏")
-            edit_btn.setStyleSheet(self.admin_button_style)
-            edit_btn.clicked.connect(lambda _, gid=game_id: self.edit_game(gid))
-            btn_layout.addWidget(edit_btn)
-
-            delete_btn = QPushButton("✖")
-            delete_btn.setStyleSheet(self.admin_button_style)
-            delete_btn.clicked.connect(lambda _, gid=game_id: self.delete_game(gid))
-            btn_layout.addWidget(delete_btn)
+            self.add_admin_buttons(btn_layout, game)
 
         self.games_layout.addLayout(btn_layout)
 
-    def launch_game(self, path, name):
-        """Запуск игры с обработкой ошибок"""
-        if os.path.exists(path):
-            try:
-                # Запуск игры без консоли (для Windows)
-                startupinfo = subprocess.STARTUPINFO()
-                startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+    def add_admin_buttons(self, layout, game):
+        """Добавление кнопок управления для администратора"""
+        # Кнопка редактирования
+        edit_btn = QPushButton("✏")
+        edit_btn.setToolTip("Редактировать игру")
+        edit_btn.clicked.connect(lambda: self.edit_game(game))
+        layout.addWidget(edit_btn)
 
-                subprocess.Popen(
-                    path,
-                    startupinfo=startupinfo,
-                    shell=True
-                )
-            except Exception as e:
-                self.show_error_message(
-                    "Ошибка запуска",
-                    f"Не удалось запустить {name}.\n\nОшибка: {str(e)}"
-                )
-        else:
-            self.show_error_message(
-                "Файл не найден",
-                f"Путь к игре {name} не найден:\n{path}"
-            )
+        # Кнопка удаления
+        delete_btn = QPushButton("🗑")
+        delete_btn.setToolTip("Удалить игру")
+        delete_btn.clicked.connect(lambda: self.delete_game(game))
+        layout.addWidget(delete_btn)
+
+    def launch_game(self, path):
+        """Запуск игры"""
+        if not os.path.exists(path):
+            QMessageBox.critical(self, "Ошибка запуска", f"Файл игры не найден: {path}")
+            return
+
+        try:
+            if os.name == "nt":
+                subprocess.Popen(path, shell=True)
+            else:
+                subprocess.Popen([path])
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка запуска", f"Не удалось запустить игру: {e}")
 
     def add_game(self):
         """Добавление новой игры"""
-        dialog = AppEditor(category_id=1, parent=self)  # category_id=1 для игр
-        if dialog.exec():
-            self.load_games_from_db()
+        games = load_json(self.games_file)
+        new_game = {
+            "id": len(games) + 1,
+            "name": "Новая игра",
+            "path": "",
+            "icon_path": ""
+        }
+        games.append(new_game)
+        save_json(self.games_file, games)
+        self.load_games()
 
-    def edit_game(self, game_id):
-        """Редактирование существующей игры"""
-        dialog = AppEditor(app_id=game_id, parent=self)
-        if dialog.exec():
-            self.load_games_from_db()
+    def edit_game(self, game):
+        """Редактирование игры (заглушка)"""
+        print(f"Редактирование игры: {game}")
 
-    def delete_game(self, game_id):
+    def delete_game(self, game):
         """Удаление игры"""
-        reply = QMessageBox.question(
-            self, 'Подтверждение',
-            'Вы уверены, что хотите удалить эту игру?',
+        confirm = QMessageBox.question(
+            self,
+            "Подтверждение удаления",
+            f"Вы уверены, что хотите удалить игру: {game['name']}?",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
-
-        if reply == QMessageBox.StandardButton.Yes:
-            conn = sqlite3.connect('launcher.db')
-            c = conn.cursor()
-            c.execute("DELETE FROM apps WHERE id=?", (game_id,))
-            conn.commit()
-            conn.close()
-            self.load_games_from_db()
-
-    def show_error_message(self, title, message):
-        """Показать сообщение об ошибке"""
-        msg = QMessageBox(self)
-        msg.setIcon(QMessageBox.Icon.Critical)
-        msg.setWindowTitle(title)
-        msg.setText(message)
-        msg.setStyleSheet("""
-            QMessageBox {
-                background-color: #333333;
-            }
-            QLabel {
-                color: white;
-            }
-            QPushButton {
-                min-width: 80px;
-                padding: 5px;
-            }
-        """)
-        msg.exec()
+        if confirm == QMessageBox.StandardButton.Yes:
+            games = load_json(self.games_file)
+            games = [g for g in games if g["id"] != game["id"]]
+            save_json(self.games_file, games)
+            self.load_games()

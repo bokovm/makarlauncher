@@ -1,2 +1,0 @@
-def database():
-    return None

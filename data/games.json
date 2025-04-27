@@ -1,0 +1,14 @@
+[
+    {
+        "id": 1,
+        "name": "Игра 1",
+        "path": "C:/Games/Game1/game1.exe",
+        "icon_path": "C:/Games/Game1/icon.png"
+    },
+    {
+        "id": 2,
+        "name": "Игра 2",
+        "path": "C:/Games/Game2/game2.exe",
+        "icon_path": "C:/Games/Game2/icon.png"
+    }
+]

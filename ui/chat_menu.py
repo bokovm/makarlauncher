@@ -1,12 +1,8 @@
 import os
-
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QLabel,
                              QHBoxLayout, QMessageBox)
-from PyQt6.QtGui import QFont, QIcon
-from PyQt6.QtCore import Qt, QSize
-import sqlite3
-from utils.launcher_tools import safe_launch
-from admin.views.dialogs.app import AppEditor  # Для редактирования приложений
+from PyQt6.QtCore import Qt
+from utils.json_utils import load_json, save_json
 
 
 class ChatMenu(QWidget):
@@ -14,74 +10,28 @@ class ChatMenu(QWidget):
         super().__init__()
         self.switch_to = switch_to
         self.is_admin = is_admin  # Флаг администратора
+        self.chats_file = "data/chats.json"  # Путь к JSON-файлу с чатами
         self.init_ui()
-        self.load_chats_from_db()  # Загрузка чатов из БД
+        self.load_chats()
 
     def init_ui(self):
+        """Инициализация пользовательского интерфейса"""
         self.layout = QVBoxLayout()
-        self.layout.setSpacing(20)
-        self.layout.setContentsMargins(50, 50, 50, 50)
-
-        # Стили для элементов
-        self.title_style = """
-            QLabel {
-                color: white;
-                font-size: 28px;
-                font-weight: bold;
-                qproperty-alignment: AlignCenter;
-            }
-        """
-
-        self.chat_button_style = """
-            QPushButton {
-                background-color: rgba(100, 180, 100, 0.85);
-                color: white;
-                font-size: 18px;
-                padding: 15px;
-                border-radius: 8px;
-                border: 2px solid #64B464;
-                min-width: 300px;
-            }
-            QPushButton:hover {
-                background-color: rgba(120, 200, 120, 0.9);
-            }
-        """
-
-        self.admin_button_style = """
-            QPushButton {
-                background-color: rgba(180, 180, 50, 0.85);
-                color: white;
-                font-size: 14px;
-                padding: 5px;
-                border-radius: 5px;
-                border: 1px solid #B4B432;
-                min-width: 30px;
-                max-width: 30px;
-            }
-            QPushButton:hover {
-                background-color: rgba(200, 200, 70, 0.9);
-            }
-        """
-
-        self.back_button_style = """
-            QPushButton {
-                background-color: rgba(200, 80, 80, 0.85);
-                color: white;
-                font-size: 18px;
-                padding: 15px;
-                border-radius: 8px;
-                border: 2px solid #C85050;
-                min-width: 150px;
-            }
-            QPushButton:hover {
-                background-color: rgba(220, 100, 100, 0.9);
-            }
-        """
+        self.layout.setSpacing(15)
+        self.layout.setContentsMargins(30, 30, 30, 30)
 
         # Заголовок
-        title = QLabel("Общение")
-        title.setStyleSheet(self.title_style)
-        self.layout.addWidget(title)
+        self.title = QLabel("Чаты")
+        self.title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.title.setStyleSheet("""
+            QLabel {
+                color: #ffffff;
+                font-size: 24px;
+                font-weight: bold;
+                padding: 10px;
+            }
+        """)
+        self.layout.addWidget(self.title)
 
         # Контейнер для списка чатов
         self.chats_container = QWidget()
@@ -90,92 +40,100 @@ class ChatMenu(QWidget):
         self.layout.addWidget(self.chats_container)
 
         # Кнопка "Назад"
-        back_btn = QPushButton("Назад")
-        back_btn.setStyleSheet(self.back_button_style)
-        back_btn.clicked.connect(lambda: self.switch_to("main"))
-        self.layout.addWidget(back_btn)
+        self.back_btn = QPushButton("Назад")
+        self.back_btn.setStyleSheet("""
+            QPushButton {
+                background-color: rgba(180, 70, 70, 0.85);
+                color: white;
+                font-size: 16px;
+                padding: 12px;
+                border-radius: 6px;
+                border: 1px solid #B22222;
+                margin-top: 20px;
+            }
+            QPushButton:hover {
+                background-color: rgba(200, 90, 90, 0.9);
+            }
+        """)
+        self.back_btn.clicked.connect(lambda: self.switch_to("main"))
+        self.layout.addWidget(self.back_btn)
 
         # Кнопка "Добавить чат" (только для админа)
         if self.is_admin:
-            add_btn = QPushButton("Добавить мессенджер")
-            add_btn.setStyleSheet(self.chat_button_style)
-            add_btn.clicked.connect(self.add_chat)
-            self.layout.addWidget(add_btn)
+            self.add_btn = QPushButton("Добавить чат")
+            self.add_btn.setStyleSheet("""
+                QPushButton {
+                    background-color: rgba(100, 180, 100, 0.85);
+                    color: white;
+                    font-size: 16px;
+                    padding: 12px;
+                    border-radius: 6px;
+                    border: 1px solid #64B464;
+                    margin-top: 10px;
+                }
+                QPushButton:hover {
+                    background-color: rgba(120, 200, 120, 0.9);
+                }
+            """)
+            self.add_btn.clicked.connect(self.add_chat_dialog)
+            self.layout.addWidget(self.add_btn)
 
         self.setLayout(self.layout)
 
-    def load_chats_from_db(self):
-        """Загрузка чатов из базы данных"""
-        conn = sqlite3.connect('launcher.db')
-        c = conn.cursor()
+    def load_chats(self):
+        """Загрузка чатов из JSON-файла"""
+        chats = load_json(self.chats_file) or []
 
-        # Получаем чаты из категории "Общение" (category_id=2)
-        c.execute("""SELECT id, name, path, icon_path FROM apps 
-                     WHERE category_id=2 ORDER BY name""")
-        chats = c.fetchall()
-        conn.close()
-
-        # Очищаем текущий список
+        # Очищаем текущий список чатов
         for i in reversed(range(self.chats_layout.count())):
-            self.chats_layout.itemAt(i).widget().setParent(None)
+            item = self.chats_layout.itemAt(i)
+            if item.widget():
+                item.widget().deleteLater()
 
         # Добавляем чаты
-        for chat_id, name, path, icon_path in chats:
-            self.add_chat_button(chat_id, name, path, icon_path)
+        if not chats:
+            self.show_info_message("Информация", "Список чатов пуст!")
+        for chat in chats:
+            self.add_chat_button(chat)
 
-    def add_chat_button(self, chat_id, name, path, icon_path=None):
+    def add_chat_button(self, chat):
         """Добавляет кнопку чата в интерфейс"""
-        btn_layout = QHBoxLayout()
+        chat_name = chat.get("name", "Без имени")
+        chat_button = QPushButton(chat_name)
+        chat_button.setStyleSheet("""
+            QPushButton {
+                background-color: rgba(70, 130, 180, 0.85);
+                color: white;
+                font-size: 16px;
+                padding: 12px;
+                border-radius: 6px;
+                border: 1px solid #4682B4;
+                text-align: left;
+                padding-left: 15px;
+            }
+            QPushButton:hover {
+                background-color: rgba(90, 150, 200, 0.9);
+            }
+        """)
+        chat_button.clicked.connect(lambda: self.open_chat(chat))
+        self.chats_layout.addWidget(chat_button)
 
-        # Основная кнопка чата
-        chat_btn = QPushButton(name)
-        chat_btn.setStyleSheet(self.chat_button_style)
+    def open_chat(self, chat):
+        """Открывает чат (заглушка)"""
+        self.show_info_message("Чат", f"Открыт чат: {chat.get('name', 'Без имени')}")
 
-        if icon_path and os.path.exists(icon_path):
-            chat_btn.setIcon(QIcon(icon_path))
-            chat_btn.setIconSize(QSize(32, 32))
+    def add_chat_dialog(self):
+        """Диалог добавления нового чата"""
+        chats = load_json(self.chats_file) or []
+        new_chat = {"id": len(chats) + 1, "name": "Новый чат"}
+        chats.append(new_chat)
+        save_json(self.chats_file, chats)
+        self.load_chats()
 
-        chat_btn.clicked.connect(lambda _, p=path: safe_launch(p, self))
-        btn_layout.addWidget(chat_btn)
-
-        # Кнопки редактирования (только для админа)
-        if self.is_admin:
-            edit_btn = QPushButton("✏")
-            edit_btn.setStyleSheet(self.admin_button_style)
-            edit_btn.clicked.connect(lambda _, cid=chat_id: self.edit_chat(cid))
-            btn_layout.addWidget(edit_btn)
-
-            delete_btn = QPushButton("✖")
-            delete_btn.setStyleSheet(self.admin_button_style)
-            delete_btn.clicked.connect(lambda _, cid=chat_id: self.delete_chat(cid))
-            btn_layout.addWidget(delete_btn)
-
-        self.chats_layout.addLayout(btn_layout)
-
-    def add_chat(self):
-        """Добавление нового чата"""
-        dialog = AppEditor(category_id=2, parent=self)  # category_id=2 для чатов
-        if dialog.exec():
-            self.load_chats_from_db()
-
-    def edit_chat(self, chat_id):
-        """Редактирование существующего чата"""
-        dialog = AppEditor(app_id=chat_id, parent=self)
-        if dialog.exec():
-            self.load_chats_from_db()
-
-    def delete_chat(self, chat_id):
-        """Удаление чата"""
-        reply = QMessageBox.question(
-            self, 'Подтверждение',
-            'Вы уверены, что хотите удалить этот мессенджер?',
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-        )
-
-        if reply == QMessageBox.StandardButton.Yes:
-            conn = sqlite3.connect('launcher.db')
-            c = conn.cursor()
-            c.execute("DELETE FROM apps WHERE id=?", (chat_id,))
-            conn.commit()
-            conn.close()
-            self.load_chats_from_db()
+    def show_info_message(self, title, message):
+        """Показать информационное сообщение"""
+        msg = QMessageBox(self)
+        msg.setIcon(QMessageBox.Icon.Information)
+        msg.setWindowTitle(title)
+        msg.setText(message)
+        msg.exec()

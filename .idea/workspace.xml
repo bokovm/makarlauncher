@@ -5,10 +5,56 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="66f2fbe2-d00f-4196-a358-65946562d888" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/config/admins.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/categories.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/settings.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/app_manager.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/category_manager.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/models.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/settings_manager.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/apps.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/categories.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/chats.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/games.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/settings.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/sites.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/file_storage.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/json_utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/admin/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/admin/auth.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/databse.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/controllers/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/controllers/categories.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/controllers/settings.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/Analysis-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/Analysis-00.toc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/COLLECT-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/COLLECT-00.toc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/EXE-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/EXE-00.toc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/PKG-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/PKG-00.toc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/PYZ-00.pyz" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/PYZ-00.pyz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/PYZ-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/PYZ-00.toc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/base_library.zip" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/base_library.zip" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/main.exe" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/main.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/main.pkg" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/main.pkg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/warn-main.txt" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/warn-main.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/xref-main.html" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/xref-main.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/apps.json" beforeDir="false" afterPath="$PROJECT_DIR$/config/apps.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/launcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/launcher.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/main.exe" beforeDir="false" afterPath="$PROJECT_DIR$/dist/main.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/main/_internal/base_library.zip" beforeDir="false" afterPath="$PROJECT_DIR$/dist/main/_internal/base_library.zip" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/main/main.exe" beforeDir="false" afterPath="$PROJECT_DIR$/dist/main/main.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.spec" beforeDir="false" afterPath="$PROJECT_DIR$/main.spec" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/browser_menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/browser_menu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/chat_menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/chat_menu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/components/menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/components/menu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/games_menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/games_menu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/main_menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/main_menu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/main_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/main_window.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/settings_menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/settings_menu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/database.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/utils/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/helpers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/update_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/update_manager.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,9 +71,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 5
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="2vjZPIACaOPq1HWIqqp1oXQzZpH" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -38,11 +84,19 @@
   "keyToString": {
     "Python.launcher.executor": "Run",
     "Python.main.executor": "Run",
+    "Python.main_menu.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "master",
+    "last_opened_file_path": "C:/Users/Makar/PycharmProjects/makarlauncher/data",
     "settings.editor.selected.configurable": "preferences.lookFeel"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Makar\PycharmProjects\makarlauncher\data" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -60,5 +114,30 @@
       <updated>1744660418038</updated>
     </task>
     <servers />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.db" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

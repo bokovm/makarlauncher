@@ -1,12 +1,10 @@
 import os
-
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QLabel,
-                             QHBoxLayout, QMessageBox, QInputDialog)
-from PyQt6.QtGui import QFont, QIcon, QPixmap
-from PyQt6.QtCore import Qt, QSize
 import webbrowser
-import sqlite3
-from admin.views.dialogs.app import AppEditor  # Для редактирования сайтов
+from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QLabel,
+                             QHBoxLayout, QMessageBox)
+from PyQt6.QtGui import QIcon
+from PyQt6.QtCore import Qt, QSize
+from utils.json_utils import load_json, save_json
 
 
 class BrowserMenu(QWidget):
@@ -14,11 +12,13 @@ class BrowserMenu(QWidget):
         super().__init__()
         self.switch_to = switch_to
         self.is_admin = is_admin  # Флаг администратора
+        self.sites_file = "data/sites.json"  # Путь к JSON файлу с сайтами
         self.init_ui()
         self.setup_styles()
-        self.load_sites_from_db()  # Загрузка сайтов из БД
+        self.load_sites()
 
     def init_ui(self):
+        """Инициализация интерфейса"""
         self.layout = QVBoxLayout()
         self.layout.setSpacing(15)
         self.layout.setContentsMargins(30, 30, 30, 30)
@@ -55,7 +55,6 @@ class BrowserMenu(QWidget):
             }
         """)
 
-        # Стиль заголовка
         self.title.setStyleSheet("""
             QLabel {
                 color: #ffffff;
@@ -65,7 +64,6 @@ class BrowserMenu(QWidget):
             }
         """)
 
-        # Общий стиль для кнопок сайтов
         self.button_style = """
             QPushButton {
                 background-color: rgba(70, 130, 180, 0.85);
@@ -82,7 +80,6 @@ class BrowserMenu(QWidget):
             }
         """
 
-        # Стиль кнопки "Назад"
         self.back_btn.setStyleSheet("""
             QPushButton {
                 background-color: rgba(180, 70, 70, 0.85);
@@ -98,7 +95,6 @@ class BrowserMenu(QWidget):
             }
         """)
 
-        # Стиль кнопки "Добавить сайт"
         if hasattr(self, 'add_btn'):
             self.add_btn.setStyleSheet("""
                 QPushButton {
@@ -115,82 +111,56 @@ class BrowserMenu(QWidget):
                 }
             """)
 
-    def load_sites_from_db(self):
-        """Загрузка сайтов из базы данных"""
-        conn = sqlite3.connect('launcher.db')
-        c = conn.cursor()
-
-        # Получаем сайты из категории "Браузер" (category_id=3)
-        c.execute("""SELECT id, name, path, icon_path FROM apps 
-                     WHERE category_id=3 ORDER BY name""")
-        sites = c.fetchall()
-        conn.close()
+    def load_sites(self):
+        """Загрузка сайтов из JSON файла"""
+        sites = load_json(self.sites_file) or []
 
         # Очищаем текущий список
         for i in reversed(range(self.sites_layout.count())):
-            self.sites_layout.itemAt(i).widget().setParent(None)
+            item = self.sites_layout.itemAt(i)
+            if item.widget():
+                item.widget().deleteLater()
 
         # Добавляем сайты
-        for site_id, name, url, icon_path in sites:
-            self.add_site_button(site_id, name, url, icon_path)
+        if not sites:
+            self.show_info_message("Информация", "Список сайтов пуст!")
+        for site in sites:
+            self.add_site_button(site)
 
-    def add_site_button(self, site_id, name, url, icon_path=None):
+    def add_site_button(self, site):
         """Добавляет кнопку сайта в интерфейс"""
         btn_layout = QHBoxLayout()
 
         # Основная кнопка сайта
-        site_btn = QPushButton(name)
+        site_btn = QPushButton(site.get("name", "Без имени"))
         site_btn.setStyleSheet(self.button_style)
 
-        if icon_path and os.path.exists(icon_path):
-            site_btn.setIcon(QIcon(icon_path))
+        if site.get("icon_path") and os.path.exists(site["icon_path"]):
+            site_btn.setIcon(QIcon(site["icon_path"]))
             site_btn.setIconSize(QSize(32, 32))
 
-        site_btn.clicked.connect(lambda _, u=url: self.open_site(u))
+        site_btn.clicked.connect(lambda _, u=site.get("url", ""): self.open_site(u))
         btn_layout.addWidget(site_btn, stretch=1)
 
         # Кнопки редактирования (только для админа)
         if self.is_admin:
-            edit_btn = QPushButton()
-            edit_btn.setIcon(QIcon.fromTheme("edit"))
+            edit_btn = QPushButton("✏")
             edit_btn.setToolTip("Редактировать")
-            edit_btn.setStyleSheet("""
-                QPushButton {
-                    background-color: rgba(180, 180, 50, 0.85);
-                    border-radius: 5px;
-                    padding: 5px;
-                    min-width: 30px;
-                    max-width: 30px;
-                }
-                QPushButton:hover {
-                    background-color: rgba(200, 200, 70, 0.9);
-                }
-            """)
-            edit_btn.clicked.connect(lambda _, sid=site_id: self.edit_site(sid))
+            edit_btn.clicked.connect(lambda: self.edit_site(site))
             btn_layout.addWidget(edit_btn)
 
-            delete_btn = QPushButton()
-            delete_btn.setIcon(QIcon.fromTheme("delete"))
+            delete_btn = QPushButton("🗑")
             delete_btn.setToolTip("Удалить")
-            delete_btn.setStyleSheet("""
-                QPushButton {
-                    background-color: rgba(180, 50, 50, 0.85);
-                    border-radius: 5px;
-                    padding: 5px;
-                    min-width: 30px;
-                    max-width: 30px;
-                }
-                QPushButton:hover {
-                    background-color: rgba(200, 70, 70, 0.9);
-                }
-            """)
-            delete_btn.clicked.connect(lambda _, sid=site_id: self.delete_site(sid))
+            delete_btn.clicked.connect(lambda: self.delete_site(site))
             btn_layout.addWidget(delete_btn)
 
         self.sites_layout.addLayout(btn_layout)
 
     def open_site(self, url):
         """Открывает сайт в браузере по умолчанию"""
+        if not url:
+            self.show_error_message("Ошибка", "URL не указан!")
+            return
         try:
             webbrowser.open(url)
         except Exception as e:
@@ -198,31 +168,29 @@ class BrowserMenu(QWidget):
 
     def add_site_dialog(self):
         """Диалог добавления нового сайта"""
-        dialog = AppEditor(category_id=3, parent=self)  # category_id=3 для сайтов
-        if dialog.exec():
-            self.load_sites_from_db()
+        sites = load_json(self.sites_file) or []
+        new_site = {"id": len(sites) + 1, "name": "Новый сайт", "url": "", "icon_path": ""}
+        sites.append(new_site)
+        save_json(self.sites_file, sites)
+        self.load_sites()
 
-    def edit_site(self, site_id):
-        """Редактирование существующего сайта"""
-        dialog = AppEditor(app_id=site_id, parent=self)
-        if dialog.exec():
-            self.load_sites_from_db()
+    def edit_site(self, site):
+        """Редактирование существующего сайта (заглушка)"""
+        self.show_info_message("Редактирование", f"Редактирование сайта: {site['name']}")
 
-    def delete_site(self, site_id):
+    def delete_site(self, site):
         """Удаление сайта"""
         reply = QMessageBox.question(
             self, 'Подтверждение',
-            'Вы уверены, что хотите удалить этот сайт?',
+            f'Вы уверены, что хотите удалить сайт: {site.get('name', 'Без имени')}?',
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
 
         if reply == QMessageBox.StandardButton.Yes:
-            conn = sqlite3.connect('launcher.db')
-            c = conn.cursor()
-            c.execute("DELETE FROM apps WHERE id=?", (site_id,))
-            conn.commit()
-            conn.close()
-            self.load_sites_from_db()
+            sites = load_json(self.sites_file) or []
+            sites = [s for s in sites if s["id"] != site["id"]]
+            save_json(self.sites_file, sites)
+            self.load_sites()
 
     def show_error_message(self, title, message):
         """Показать сообщение об ошибке"""
@@ -230,15 +198,12 @@ class BrowserMenu(QWidget):
         msg.setIcon(QMessageBox.Icon.Critical)
         msg.setWindowTitle(title)
         msg.setText(message)
-        msg.setStyleSheet("""
-            QMessageBox {
-                background-color: #333333;
-            }
-            QLabel {
-                color: white;
-            }
-            QPushButton {
-                min-width: 80px;
-            }
-        """)
+        msg.exec()
+
+    def show_info_message(self, title, message):
+        """Показать информационное сообщение"""
+        msg = QMessageBox(self)
+        msg.setIcon(QMessageBox.Icon.Information)
+        msg.setWindowTitle(title)
+        msg.setText(message)
         msg.exec()
