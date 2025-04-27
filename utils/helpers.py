@@ -92,3 +92,8 @@ def get_app_data_dir(app_name: str = "MakarLauncher") -> str:
     except Exception as e:
         logging.error(f"Ошибка при создании директории данных приложения: {e}")
         raise
+
+def resource_path(relative_path):
+    """Возвращает абсолютный путь к ресурсу"""
+    base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)

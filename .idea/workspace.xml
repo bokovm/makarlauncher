@@ -5,13 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="66f2fbe2-d00f-4196-a358-65946562d888" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/ui/admin_login.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/admin/auth.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/apps.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/apps.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/categories.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/categories.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/launcher.db" beforeDir="false" afterPath="$PROJECT_DIR$/data/admins.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/components/menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/components/menu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/launcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/launcher.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/main_menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/main_menu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/main_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/main_window.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/helpers.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

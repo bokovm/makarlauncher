@@ -26,33 +26,28 @@ class MainMenu(QWidget):
 
     def update_layout(self):
         """Обновление интерфейса с категориями и приложениями."""
-        # Очищаем текущий layout.
-        while self.layout.count():
-            child = self.layout.takeAt(0)
-            if child.widget():
-                child.widget().deleteLater()
+        # Очищаем текущий layout
+        self.clear_layout(self.layout)
 
-        # Загружаем категории и приложения.
-        categories = load_json("data/categories.json") or []
-        apps = load_json("data/apps.json") or []
+        # Загружаем категории и приложения
+        try:
+            categories = load_json("data/categories.json") or []
+            apps = load_json("data/apps.json") or []
+        except Exception as e:
+            self.show_message(f"Ошибка загрузки данных: {str(e)}")
+            return
 
         if not categories:
             self.show_message("Категории не найдены в JSON-файле.")
             return
 
         for category in categories:
-            # Добавляем заголовок категории.
+            # Добавляем заголовок категории
             category_label = QLabel(category.get("name", "Без имени"))
             category_label.setStyleSheet("font-size: 20px; color: white; margin-top: 20px;")
             self.layout.addWidget(category_label)
 
-            # Контейнер для приложений в данной категории.
-            apps_container = QWidget()
-            apps_layout = QHBoxLayout()
-            apps_layout.setSpacing(10)
-            apps_container.setLayout(apps_layout)
-
-            # Фильтруем приложения по категории.
+            # Фильтруем приложения по категории
             category_apps = [app for app in apps if app.get("category_id") == category.get("id")]
 
             if not category_apps:
@@ -61,13 +56,19 @@ class MainMenu(QWidget):
                 self.layout.addWidget(empty_label)
                 continue
 
+            # Создаем контейнер для приложений
+            apps_container = QWidget()
+            apps_layout = QHBoxLayout()
+            apps_layout.setSpacing(10)
+            apps_container.setLayout(apps_layout)
+
             for app in category_apps:
                 app_btn = self.create_app_button(app)
                 apps_layout.addWidget(app_btn)
 
             self.layout.addWidget(apps_container)
 
-        # Кнопка для входа в админ-панель.
+        # Кнопка для входа в админ-панель
         admin_btn = QPushButton("Админ-панель")
         admin_btn.setStyleSheet("""
             QPushButton {
@@ -83,7 +84,14 @@ class MainMenu(QWidget):
             }
         """)
         admin_btn.clicked.connect(self.admin_auth_callback)
-        self.layout.addWidget(admin_btn)
+        self.layout.addWidget(admin_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+
+    def clear_layout(self, layout):
+        """Очищает layout от всех виджетов."""
+        while layout.count():
+            child = layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
 
     def create_app_button(self, app):
         """
@@ -93,14 +101,16 @@ class MainMenu(QWidget):
         """
         app_name = app.get("name", "Без имени")
         app_path = app.get("path", "")
-        app_icon = app.get("icon_path", "")
         bg_color = app.get("bg_color", "#4682B4")
         is_square = app.get("is_square", False)
 
         app_btn = QPushButton(app_name)
         app_btn.setToolTip(app_name)
 
-        # Настройка внешнего вида кнопки.
+        # Устанавливаем фиксированный размер для квадратных кнопок
+        if is_square:
+            app_btn.setFixedSize(100, 100)
+
         app_btn.setStyleSheet(f"""
             QPushButton {{
                 font-size: 16px;
@@ -109,15 +119,15 @@ class MainMenu(QWidget):
                 padding: 10px;
                 border-radius: {'10px' if is_square else '32px'};
                 border: none;
+                min-width: {'100px' if is_square else '64px'};
+                min-height: {'100px' if is_square else '64px'};
             }}
             QPushButton:hover {{
                 background-color: #5A9BD5;
             }}
         """)
 
-        # Обработчик клика.
         app_btn.clicked.connect(lambda _, p=app_path: self.launch_app(p))
-
         return app_btn
 
     def launch_app(self, path):
@@ -125,9 +135,16 @@ class MainMenu(QWidget):
         Запуск приложения.
         :param path: Путь к приложению.
         """
+        if not path:
+            self.show_message("Путь к приложению не указан")
+            return
+
         if os.path.exists(path):
             try:
-                os.startfile(path)
+                if os.name == 'nt':  # Windows
+                    os.startfile(path)
+                elif os.name == 'posix':  # Linux, Mac
+                    os.system(f'xdg-open "{path}"')
             except Exception as e:
                 self.show_message(f"Не удалось запустить приложение: {str(e)}")
         else:
@@ -138,4 +155,4 @@ class MainMenu(QWidget):
         Отображение сообщения пользователю.
         :param message: Текст сообщения.
         """
-        QMessageBox.information(self, "Информация", message)
+        QMessageBox.critical(self, "Ошибка", message)

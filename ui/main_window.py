@@ -1,7 +1,13 @@
-from PyQt6.QtWidgets import QMainWindow, QStackedWidget, QDialog
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QAction, QIcon
+from PyQt6.QtWidgets import QMainWindow, QStackedWidget, QDialog, QToolBar
+
+from admin.auth import AdminLoginDialog
 from ui.main_menu import MainMenu  # Предполагается, что MainMenu определён в отдельном файле
 from admin.views.panels import AdminPanel
 import sqlite3
+
+from utils.helpers import resource_path
 
 
 class MainWindow(QMainWindow):
@@ -13,6 +19,32 @@ class MainWindow(QMainWindow):
         # Создаем виджет с переключением между экранами
         self.stacked_widget = QStackedWidget()
         self.setCentralWidget(self.stacked_widget)
+
+        # Флаг полноэкранного режима
+        self.is_fullscreen = False
+
+        # Добавляем экраны
+        self.main_menu = MainMenu(self.switch_to_screen, self.show_admin_panel)
+        self.stacked_widget.addWidget(self.main_menu)
+
+        # Инициализируем панель инструментов
+        self.init_toolbar()
+
+    def init_toolbar(self):
+        """Инициализация панели инструментов"""
+        toolbar = QToolBar("Основная панель")
+        toolbar.setIconSize(Qt.QSize(24, 24))
+        self.addToolBar(toolbar)
+
+        # Кнопка переключения полноэкранного режима
+        fullscreen_action = QAction(QIcon(resource_path("assets/fullscreen_icon.png")), "Полноэкранный режим", self)
+        fullscreen_action.triggered.connect(self.toggle_fullscreen)
+        toolbar.addAction(fullscreen_action)
+
+        # Кнопка выхода
+        exit_action = QAction(QIcon(resource_path("assets/exit_icon.png")), "Выход", self)
+        exit_action.triggered.connect(self.close)
+        toolbar.addAction(exit_action)
 
         # Инициализация экранов
         self.main_menu = MainMenu(self.show_admin_panel)
@@ -26,9 +58,34 @@ class MainWindow(QMainWindow):
         self.load_settings()
         self.show_main_menu()
 
+    def toggle_fullscreen(self):
+        """Переключение между полноэкранным и оконным режимом"""
+        if self.isFullScreen():
+            self.showNormal()
+            self.is_fullscreen = False
+        else:
+            self.showFullScreen()
+            self.is_fullscreen = True
+
+    def switch_to_screen(self, screen_name):
+        """Переключение между экранами"""
+        if screen_name == "main":
+            self.stacked_widget.setCurrentWidget(self.main_menu)
+        # Можно добавить другие экраны по мере необходимости
+
+    def show_admin_panel(self):
+        """Отображение окна авторизации администратора"""
+        auth_dialog = AdminLoginDialog(self)
+        if auth_dialog.exec():
+            # Если авторизация успешна, можно переключиться на админ-панель
+            print("Админ авторизован!")
+
     def show_main_menu(self):
         """Отображение главного меню"""
-        self.stacked_widget.setCurrentWidget(self.main_menu)
+        if self.main_menu:
+            self.stack.setCurrentWidget(self.main_menu)
+        else:
+            logging.error("Главное меню не инициализировано")
 
     def show_admin_panel(self):
         """Отображение панели администратора с авторизацией"""

@@ -1,3 +1,4 @@
+import logging
 import sys
 import os
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QStackedWidget, QPushButton,
@@ -19,6 +20,8 @@ class Launcher(QWidget):
         super().__init__()
 
         # Основные настройки окна
+        self.is_fullscreen = False
+        self.is_fullscreen = None
         self.setWindowTitle("Лаунчер для бабушки")
         self.setMinimumSize(800, 600)
 
@@ -36,6 +39,9 @@ class Launcher(QWidget):
     def setup_background(self):
         """Настройка фонового изображения"""
         bg_path = self.resource_path('assets/background.jpg')
+        if not os.path.exists(bg_path):
+            print(f"Фон не найден: {bg_path}")
+            # Установите цвет по умолчанию
         pixmap = QPixmap(bg_path)
 
         if pixmap.isNull():
@@ -122,13 +128,15 @@ class Launcher(QWidget):
         self.switch_to("main")
         self.showFullScreen()
 
+    import logging
+
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
     def show_admin_auth(self):
         """Показывает диалог авторизации администратора"""
         try:
             if not self.admin_panel:
-                # Инициализируем админ-панель при первом входе
                 self.admin_panel = AdminPanel(self)
-                self.admin_panel.setStyleSheet("background: transparent;")
                 self.stack.addWidget(self.admin_panel)
 
             dialog = AdminLoginDialog(self)
@@ -136,8 +144,9 @@ class Launcher(QWidget):
                 self.stack.setCurrentWidget(self.admin_panel)
                 self.admin_button.hide()
             else:
-                QMessageBox.warning(self, "Ошибка", "Неверный пароль администратора")
+                logging.warning("Неверный пароль администратора")
         except Exception as e:
+            logging.error(f"Ошибка при загрузке админ-панели: {e}")
             QMessageBox.critical(self, "Ошибка", f"Не удалось загрузить админ-панель: {e}")
 
     def switch_to(self, screen_name):
@@ -155,9 +164,11 @@ class Launcher(QWidget):
         if self.isFullScreen():
             self.showNormal()
             self.toggle_button.setIcon(QIcon(self.resource_path("assets/fullscreen_icon.png")))
+            self.is_fullscreen = False
         else:
             self.showFullScreen()
             self.toggle_button.setIcon(QIcon(self.resource_path("assets/windowed_icon.png")))
+            self.is_fullscreen = True
 
     def resizeEvent(self, event):
         """Обработка изменения размера окна"""
