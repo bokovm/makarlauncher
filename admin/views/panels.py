@@ -1,3 +1,5 @@
+import json
+import os
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QTabWidget, QListWidget, QPushButton,
                              QHBoxLayout, QFormLayout, QLineEdit, QLabel, QSlider,
                              QFontComboBox, QMessageBox, QListWidgetItem, QDialog, QFileDialog, QColorDialog)
@@ -6,17 +8,20 @@ from PyQt6.QtCore import Qt
 from .dialogs.auth import ChangePasswordDialog
 from .dialogs.category import CategoryEditor
 from .dialogs.app import AppEditor
-import sqlite3
-import os
 
 
 class AdminPanel(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.main_window = parent
+        self.data_dir = "data"  # Директория с JSON-файлами
+        self.categories_file = os.path.join(self.data_dir, "categories.json")
+        self.apps_file = os.path.join(self.data_dir, "apps.json")
+        self.settings_file = os.path.join(self.data_dir, "settings.json")
         self.init_ui()
 
     def init_ui(self):
+        """Инициализация основного интерфейса"""
         layout = QVBoxLayout()
 
         self.tabs = QTabWidget()
@@ -39,7 +44,11 @@ class AdminPanel(QWidget):
         layout.addWidget(self.tabs)
         self.setLayout(layout)
 
+    # --------------------
+    # Категории
+    # --------------------
     def init_categories_tab(self):
+        """Инициализация вкладки категорий"""
         layout = QVBoxLayout()
 
         self.categories_list = QListWidget()
@@ -62,7 +71,67 @@ class AdminPanel(QWidget):
 
         self.categories_tab.setLayout(layout)
 
+    def load_categories(self):
+        """Загрузка списка категорий из JSON"""
+        self.categories_list.clear()
+        try:
+            with open(self.categories_file, "r", encoding="utf-8") as file:
+                categories = json.load(file)
+            for category in categories:
+                item = QListWidgetItem(category["name"])
+                item.setData(Qt.ItemDataRole.UserRole, category["id"])
+                self.categories_list.addItem(item)
+        except (FileNotFoundError, json.JSONDecodeError):
+            QMessageBox.warning(self, "Ошибка", "Не удалось загрузить категории!")
+
+    def save_categories(self, categories):
+        """Сохранение списка категорий в JSON"""
+        try:
+            with open(self.categories_file, "w", encoding="utf-8") as file:
+                json.dump(categories, file, indent=4, ensure_ascii=False)
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Не удалось сохранить категории: {e}")
+
+    def add_category(self):
+        """Добавление новой категории"""
+        dialog = CategoryEditor(parent=self)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            self.load_categories()
+
+    def edit_category(self):
+        """Редактирование выбранной категории"""
+        selected = self.categories_list.currentItem()
+        if not selected:
+            QMessageBox.warning(self, "Ошибка", "Выберите категорию для редактирования!")
+            return
+
+        cat_id = selected.data(Qt.ItemDataRole.UserRole)
+        dialog = CategoryEditor(category_id=cat_id, parent=self)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            self.load_categories()
+
+    def delete_category(self):
+        """Удаление выбранной категории"""
+        selected = self.categories_list.currentItem()
+        if not selected:
+            QMessageBox.warning(self, "Ошибка", "Выберите категорию для удаления!")
+            return
+
+        cat_id = selected.data(Qt.ItemDataRole.UserRole)
+        try:
+            with open(self.categories_file, "r", encoding="utf-8") as file:
+                categories = json.load(file)
+            categories = [cat for cat in categories if cat["id"] != cat_id]
+            self.save_categories(categories)
+            self.load_categories()
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Не удалось удалить категорию: {e}")
+
+    # --------------------
+    # Приложения
+    # --------------------
     def init_apps_tab(self):
+        """Инициализация вкладки приложений"""
         layout = QVBoxLayout()
 
         self.apps_list = QListWidget()
@@ -85,7 +154,68 @@ class AdminPanel(QWidget):
 
         self.apps_tab.setLayout(layout)
 
+    def load_apps(self):
+        """Загрузка списка приложений из JSON"""
+        self.apps_list.clear()
+        try:
+            with open(self.apps_file, "r", encoding="utf-8") as file:
+                apps = json.load(file)
+            for app in apps:
+                item_text = f"{app['name']} ({app.get('category_id', 'Без категории')})"
+                item = QListWidgetItem(item_text)
+                item.setData(Qt.ItemDataRole.UserRole, app["id"])
+                self.apps_list.addItem(item)
+        except (FileNotFoundError, json.JSONDecodeError):
+            QMessageBox.warning(self, "Ошибка", "Не удалось загрузить приложения!")
+
+    def save_apps(self, apps):
+        """Сохранение списка приложений в JSON"""
+        try:
+            with open(self.apps_file, "w", encoding="utf-8") as file:
+                json.dump(apps, file, indent=4, ensure_ascii=False)
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Не удалось сохранить приложения: {e}")
+
+    def add_app(self):
+        """Добавление нового приложения"""
+        dialog = AppEditor(parent=self)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            self.load_apps()
+
+    def edit_app(self):
+        """Редактирование выбранного приложения"""
+        selected = self.apps_list.currentItem()
+        if not selected:
+            QMessageBox.warning(self, "Ошибка", "Выберите приложение для редактирования!")
+            return
+
+        app_id = selected.data(Qt.ItemDataRole.UserRole)
+        dialog = AppEditor(app_id=app_id, parent=self)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            self.load_apps()
+
+    def delete_app(self):
+        """Удаление выбранного приложения"""
+        selected = self.apps_list.currentItem()
+        if not selected:
+            QMessageBox.warning(self, "Ошибка", "Выберите приложение для удаления!")
+            return
+
+        app_id = selected.data(Qt.ItemDataRole.UserRole)
+        try:
+            with open(self.apps_file, "r", encoding="utf-8") as file:
+                apps = json.load(file)
+            apps = [app for app in apps if app["id"] != app_id]
+            self.save_apps(apps)
+            self.load_apps()
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Не удалось удалить приложение: {e}")
+
+    # --------------------
+    # Настройки
+    # --------------------
     def init_settings_tab(self):
+        """Инициализация вкладки настроек"""
         layout = QFormLayout()
 
         self.bg_image_input = QLineEdit()
@@ -119,171 +249,60 @@ class AdminPanel(QWidget):
         layout.addRow("", self.change_pass_btn)
         layout.addRow("", self.save_settings_btn)
 
-        self.load_settings()
         self.settings_tab.setLayout(layout)
-
-    def load_categories(self):
-        self.categories_list.clear()
-        conn = sqlite3.connect('launcher.db')
-        c = conn.cursor()
-        c.execute("SELECT id, name FROM categories ORDER BY sort_order")
-        categories = c.fetchall()
-        conn.close()
-
-        for cat_id, name in categories:
-            item = QListWidgetItem(name)
-            item.setData(Qt.ItemDataRole.UserRole, cat_id)
-            self.categories_list.addItem(item)
-
-    def load_apps(self):
-        self.apps_list.clear()
-        conn = sqlite3.connect('launcher.db')
-        c = conn.cursor()
-        c.execute("SELECT a.id, a.name, c.name FROM apps a LEFT JOIN categories c ON a.category_id = c.id")
-        apps = c.fetchall()
-        conn.close()
-
-        for app_id, app_name, cat_name in apps:
-            item = QListWidgetItem(f"{app_name} ({cat_name})" if cat_name else app_name)
-            item.setData(Qt.ItemDataRole.UserRole, app_id)
-            self.apps_list.addItem(item)
+        self.load_settings()
 
     def load_settings(self):
-        conn = sqlite3.connect('launcher.db')
-        c = conn.cursor()
-        c.execute("SELECT background_image, background_color, opacity, font_family FROM settings WHERE id=1")
-        settings = c.fetchone()
-        conn.close()
+        """Загрузка настроек из JSON"""
+        try:
+            with open(self.settings_file, "r", encoding="utf-8") as file:
+                settings = json.load(file)
+            self.bg_image_input.setText(settings.get("background_image", ""))
+            bg_color = settings.get("background_color", "#FFFFFF")
+            self.bg_color_preview.setStyleSheet(f"background-color: {bg_color};")
+            self.bg_color_preview.color = bg_color
+            self.opacity_slider.setValue(int(settings.get("opacity", 0.9) * 100))
+            self.font_combo.setCurrentText(settings.get("font_family", "Arial"))
+        except (FileNotFoundError, json.JSONDecodeError):
+            QMessageBox.warning(self, "Ошибка", "Не удалось загрузить настройки!")
 
-        if settings:
-            self.bg_image_input.setText(settings[0] if settings[0] else "")
-            if settings[1]:
-                self.bg_color_preview.setStyleSheet(f"background-color: {settings[1]};")
-                self.bg_color_preview.color = settings[1]
-            self.opacity_slider.setValue(int(settings[2] * 100) if settings[2] else 90)
-            if settings[3]:
-                index = self.font_combo.findText(settings[3])
-                if index >= 0:
-                    self.font_combo.setCurrentIndex(index)
+    def save_settings(self):
+        """Сохранение настроек в JSON"""
+        bg_image = self.bg_image_input.text().strip()
+        bg_color = getattr(self.bg_color_preview, 'color', "#FFFFFF")
+        opacity = self.opacity_slider.value() / 100
+        font_family = self.font_combo.currentText()
 
-    def add_category(self):
-        dialog = CategoryEditor(parent=self)
-        if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.load_categories()
-
-    def edit_category(self):
-        selected = self.categories_list.currentItem()
-        if not selected:
-            QMessageBox.warning(self, "Ошибка", "Выберите категорию для редактирования!")
-            return
-
-        cat_id = selected.data(Qt.ItemDataRole.UserRole)
-        dialog = CategoryEditor(category_id=cat_id, parent=self)
-        if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.load_categories()
-
-    def delete_category(self):
-        selected = self.categories_list.currentItem()
-        if not selected:
-            QMessageBox.warning(self, "Ошибка", "Выберите категорию для удаления!")
-            return
-
-        cat_id = selected.data(Qt.ItemDataRole.UserRole)
-
-        conn = sqlite3.connect('launcher.db')
-        c = conn.cursor()
-        c.execute("SELECT COUNT(*) FROM apps WHERE category_id=?", (cat_id,))
-        apps_count = c.fetchone()[0]
-        conn.close()
-
-        if apps_count > 0:
-            reply = QMessageBox.question(
-                self, "Подтверждение",
-                f"В этой категории {apps_count} приложений. Удалить категорию и все связанные приложения?",
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-
-            if reply != QMessageBox.StandardButton.Yes:
-                return
-
-        conn = sqlite3.connect('launcher.db')
-        c = conn.cursor()
-        c.execute("DELETE FROM categories WHERE id=?", (cat_id,))
-        if apps_count > 0:
-            c.execute("DELETE FROM apps WHERE category_id=?", (cat_id,))
-        conn.commit()
-        conn.close()
-
-        self.load_categories()
-        self.load_apps()
-
-    def add_app(self):
-        dialog = AppEditor(parent=self)
-        if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.load_apps()
-
-    def edit_app(self):
-        selected = self.apps_list.currentItem()
-        if not selected:
-            QMessageBox.warning(self, "Ошибка", "Выберите приложение для редактирования!")
-            return
-
-        app_id = selected.data(Qt.ItemDataRole.UserRole)
-        dialog = AppEditor(app_id=app_id, parent=self)
-        if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.load_apps()
-
-    def delete_app(self):
-        selected = self.apps_list.currentItem()
-        if not selected:
-            QMessageBox.warning(self, "Ошибка", "Выберите приложение для удаления!")
-            return
-
-        app_id = selected.data(Qt.ItemDataRole.UserRole)
-
-        reply = QMessageBox.question(
-            self, "Подтверждение",
-            "Вы уверены, что хотите удалить это приложение?",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-
-        if reply == QMessageBox.StandardButton.Yes:
-            conn = sqlite3.connect('launcher.db')
-            c = conn.cursor()
-            c.execute("DELETE FROM apps WHERE id=?", (app_id,))
-            conn.commit()
-            conn.close()
-
-            self.load_apps()
+        settings = {
+            "background_image": bg_image,
+            "background_color": bg_color,
+            "opacity": opacity,
+            "font_family": font_family
+        }
+        try:
+            with open(self.settings_file, "w", encoding="utf-8") as file:
+                json.dump(settings, file, indent=4, ensure_ascii=False)
+            QMessageBox.information(self, "Сохранено", "Настройки успешно сохранены!")
+            if self.main_window:
+                self.main_window.apply_settings()
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Не удалось сохранить настройки: {e}")
 
     def browse_bg_image(self):
+        """Выбор фонового изображения"""
         file_path, _ = QFileDialog.getOpenFileName(
             self, "Выберите фоновое изображение", "", "Images (*.png *.jpg *.jpeg)")
         if file_path:
             self.bg_image_input.setText(file_path)
 
     def choose_bg_color(self):
+        """Выбор цвета фона"""
         color = QColorDialog.getColor()
         if color.isValid():
             self.bg_color_preview.setStyleSheet(f"background-color: {color.name()};")
             self.bg_color_preview.color = color.name()
 
     def change_password(self):
+        """Изменение пароля администратора"""
         dialog = ChangePasswordDialog(parent=self)
         dialog.exec()
-
-    def save_settings(self):
-        bg_image = self.bg_image_input.text().strip()
-        bg_color = getattr(self.bg_color_preview, 'color', None)
-        opacity = self.opacity_slider.value() / 100
-        font_family = self.font_combo.currentText()
-
-        conn = sqlite3.connect('launcher.db')
-        c = conn.cursor()
-        c.execute('''UPDATE settings SET 
-                     background_image=?, background_color=?, opacity=?, font_family=?
-                     WHERE id=1''',
-                  (bg_image if bg_image else None, bg_color, opacity, font_family))
-        conn.commit()
-        conn.close()
-
-        QMessageBox.information(self, "Сохранено", "Настройки успешно сохранены!")
-        self.main_window.apply_settings()
