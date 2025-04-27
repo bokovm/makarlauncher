@@ -26,7 +26,8 @@ class AdminPanel(QWidget):
 
         # Проверка авторизации для доступа к админ-панели
         if not self.authenticate_user():
-            QMessageBox.critical(self, "Доступ запрещен", "Вы не авторизованы!")
+            # Если авторизация неуспешна, закрываем админ-панель
+            self.close()
             return
 
         self.init_ui()
@@ -44,6 +45,28 @@ class AdminPanel(QWidget):
             if login_dialog.exec() != QDialog.DialogCode.Accepted:
                 return False
         return True
+
+    def init_ui(self):
+        """Инициализация интерфейса админ-панели"""
+        layout = QVBoxLayout()
+
+        self.tabs = QTabWidget()
+
+        # Вкладки админ-панели (категории, приложения, настройки)
+        self.categories_tab = QWidget()
+        self.init_categories_tab()
+        self.tabs.addTab(self.categories_tab, "Категории")
+
+        self.apps_tab = QWidget()
+        self.init_apps_tab()
+        self.tabs.addTab(self.apps_tab, "Приложения")
+
+        self.settings_tab = QWidget()
+        self.init_settings_tab()
+        self.tabs.addTab(self.settings_tab, "Настройки")
+
+        layout.addWidget(self.tabs)
+        self.setLayout(layout)
 
     def init_ui(self):
         """Инициализация интерфейса админ-панели"""
