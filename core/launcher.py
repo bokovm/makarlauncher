@@ -222,16 +222,16 @@ class Launcher(QWidget):
         try:
             if self.isFullScreen():
                 self.showNormal()
-                icon = self.load_icon("assets/fullscreen_icon.png")
-                self.toggle_button.setToolTip("Полноэкранный режим")
+                icon_path = "assets/windowed_icon.png"
+                self.toggle_button.setToolTip("Переключить в полноэкранный режим")
             else:
                 self.showFullScreen()
-                icon = self.load_icon("assets/windowed_icon.png")
-                self.toggle_button.setToolTip("Оконный режим")
+                icon_path = "assets/fullscreen_icon.png"
+                self.toggle_button.setToolTip("Переключить в оконный режим")
 
+            icon = self.load_icon(icon_path)
             self.toggle_button.setIcon(icon)
-            self.is_fullscreen = self.isFullScreen()
-            logging.debug(f"Переключен режим {'полноэкранный' if self.is_fullscreen else 'оконный'}")
+            logging.debug(f"Режим переключен: {'Полноэкранный' if self.isFullScreen() else 'Оконный'}")
         except Exception as e:
             logging.error(f"Ошибка при переключении режима: {e}", exc_info=True)
 

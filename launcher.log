@@ -28,3 +28,92 @@
 2025-04-28 01:55:22,315 - DEBUG - Ресурсный путь: assets/admin_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/admin_icon.png
 2025-04-28 01:55:22,329 - DEBUG - Ресурсный путь: assets/fullscreen_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/fullscreen_icon.png
 2025-04-28 01:55:22,348 - DEBUG - Переключено на экран: main
+2025-04-28 16:48:34,995 - DEBUG - Ресурсный путь: assets/background.jpg -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/background.jpg
+2025-04-28 16:48:35,628 - INFO - Чтение JSON-файла: data/categories.json
+2025-04-28 16:48:35,630 - INFO - Чтение JSON-файла: data/apps.json
+2025-04-28 16:48:35,677 - INFO - Чтение JSON-файла: data/games.json
+2025-04-28 16:48:35,691 - INFO - Чтение JSON-файла: data/sites.json
+2025-04-28 16:48:35,703 - INFO - Чтение JSON-файла: data/chats.json
+2025-04-28 16:48:35,714 - INFO - Чтение JSON-файла: data/settings.json
+2025-04-28 16:48:35,844 - DEBUG - Меню 'main' успешно добавлено
+2025-04-28 16:48:35,850 - DEBUG - Меню 'games' успешно добавлено
+2025-04-28 16:48:35,856 - DEBUG - Меню 'browser' успешно добавлено
+2025-04-28 16:48:35,866 - DEBUG - Меню 'chat' успешно добавлено
+2025-04-28 16:48:35,871 - DEBUG - Меню 'settings' успешно добавлено
+2025-04-28 16:48:35,872 - DEBUG - Ресурсный путь: assets/admin_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/admin_icon.png
+2025-04-28 16:48:35,900 - DEBUG - Ресурсный путь: assets/fullscreen_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/fullscreen_icon.png
+2025-04-28 16:48:35,932 - DEBUG - Переключено на экран: main
+2025-04-28 16:48:38,463 - DEBUG - Ресурсный путь: assets/windowed_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/windowed_icon.png
+2025-04-28 16:48:38,466 - DEBUG - Режим переключен: Оконный
+2025-04-28 16:57:44,583 - DEBUG - Ресурсный путь: assets/background.jpg -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/background.jpg
+2025-04-28 16:57:45,320 - INFO - Чтение JSON-файла: data/categories.json
+2025-04-28 16:57:45,322 - INFO - Чтение JSON-файла: data/apps.json
+2025-04-28 16:57:45,364 - INFO - Чтение JSON-файла: data/games.json
+2025-04-28 16:57:45,388 - INFO - Чтение JSON-файла: data/sites.json
+2025-04-28 16:57:45,446 - INFO - Чтение JSON-файла: data/chats.json
+2025-04-28 16:57:45,475 - INFO - Чтение JSON-файла: data/settings.json
+2025-04-28 16:57:45,611 - DEBUG - Меню 'main' успешно добавлено
+2025-04-28 16:57:45,615 - DEBUG - Меню 'games' успешно добавлено
+2025-04-28 16:57:45,625 - DEBUG - Меню 'browser' успешно добавлено
+2025-04-28 16:57:45,631 - DEBUG - Меню 'chat' успешно добавлено
+2025-04-28 16:57:45,633 - DEBUG - Меню 'settings' успешно добавлено
+2025-04-28 16:57:45,634 - DEBUG - Ресурсный путь: assets/admin_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/admin_icon.png
+2025-04-28 16:57:45,652 - DEBUG - Ресурсный путь: assets/fullscreen_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/fullscreen_icon.png
+2025-04-28 16:57:45,672 - DEBUG - Переключено на экран: main
+2025-04-28 16:57:47,918 - DEBUG - Ресурсный путь: assets/windowed_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/windowed_icon.png
+2025-04-28 16:57:47,919 - DEBUG - Режим переключен: Оконный
+2025-04-28 17:04:56,545 - DEBUG - Ресурсный путь: assets/background.jpg -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/background.jpg
+2025-04-28 17:04:56,828 - INFO - Чтение JSON-файла: data/categories.json
+2025-04-28 17:04:56,828 - INFO - Чтение JSON-файла: data/apps.json
+2025-04-28 17:04:56,839 - INFO - Чтение JSON-файла: data/games.json
+2025-04-28 17:04:56,845 - INFO - Чтение JSON-файла: data/sites.json
+2025-04-28 17:04:56,849 - INFO - Чтение JSON-файла: data/chats.json
+2025-04-28 17:04:56,852 - INFO - Чтение JSON-файла: data/settings.json
+2025-04-28 17:04:56,893 - DEBUG - Меню 'main' успешно добавлено
+2025-04-28 17:04:56,897 - DEBUG - Меню 'games' успешно добавлено
+2025-04-28 17:04:56,900 - DEBUG - Меню 'browser' успешно добавлено
+2025-04-28 17:04:56,905 - DEBUG - Меню 'chat' успешно добавлено
+2025-04-28 17:04:56,907 - DEBUG - Меню 'settings' успешно добавлено
+2025-04-28 17:04:56,908 - DEBUG - Ресурсный путь: assets/admin_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/admin_icon.png
+2025-04-28 17:04:56,922 - DEBUG - Ресурсный путь: assets/fullscreen_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/fullscreen_icon.png
+2025-04-28 17:04:56,942 - DEBUG - Переключено на экран: main
+2025-04-28 17:04:58,728 - DEBUG - Ресурсный путь: assets/windowed_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/windowed_icon.png
+2025-04-28 17:04:58,732 - DEBUG - Режим переключен: Оконный
+2025-04-28 17:05:02,604 - WARNING - Неудачная попытка входа в админ-панель
+2025-04-28 17:15:37,831 - DEBUG - Ресурсный путь: assets/background.jpg -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/background.jpg
+2025-04-28 17:15:38,055 - ERROR - Ошибка при инициализации меню: 'MainMenu' object has no attribute 'clear_layout'
+2025-04-28 17:15:41,043 - DEBUG - Ресурсный путь: assets/admin_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/admin_icon.png
+2025-04-28 17:15:41,066 - DEBUG - Ресурсный путь: assets/fullscreen_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/fullscreen_icon.png
+2025-04-28 17:15:41,077 - ERROR - Попытка переключения на несуществующий экран: main
+2025-04-28 17:15:42,745 - DEBUG - Ресурсный путь: assets/windowed_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/windowed_icon.png
+2025-04-28 17:15:42,748 - DEBUG - Режим переключен: Оконный
+2025-04-28 17:19:50,486 - DEBUG - Ресурсный путь: assets/background.jpg -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/background.jpg
+2025-04-28 17:19:50,964 - INFO - Чтение JSON-файла: data/categories.json
+2025-04-28 17:19:50,994 - INFO - Чтение JSON-файла: data/games.json
+2025-04-28 17:19:51,003 - INFO - Чтение JSON-файла: data/sites.json
+2025-04-28 17:19:51,017 - INFO - Чтение JSON-файла: data/chats.json
+2025-04-28 17:19:51,030 - INFO - Чтение JSON-файла: data/settings.json
+2025-04-28 17:19:51,124 - DEBUG - Меню 'main' успешно добавлено
+2025-04-28 17:19:51,133 - DEBUG - Меню 'games' успешно добавлено
+2025-04-28 17:19:51,144 - DEBUG - Меню 'browser' успешно добавлено
+2025-04-28 17:19:51,162 - DEBUG - Меню 'chat' успешно добавлено
+2025-04-28 17:19:51,165 - DEBUG - Меню 'settings' успешно добавлено
+2025-04-28 17:19:51,167 - DEBUG - Ресурсный путь: assets/admin_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/admin_icon.png
+2025-04-28 17:19:51,199 - DEBUG - Ресурсный путь: assets/fullscreen_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/fullscreen_icon.png
+2025-04-28 17:19:51,230 - DEBUG - Переключено на экран: main
+2025-04-28 17:19:58,130 - DEBUG - Ресурсный путь: assets/windowed_icon.png -> C:\Users\Makar\PycharmProjects\makarlauncher\assets/windowed_icon.png
+2025-04-28 17:19:58,132 - DEBUG - Режим переключен: Оконный
+2025-04-28 17:22:07,345 - INFO - Чтение JSON-файла: data/apps.json
+2025-04-28 17:22:08,514 - INFO - Чтение JSON-файла: data/categories.json
+2025-04-28 17:22:08,932 - INFO - Чтение JSON-файла: data/apps.json
+2025-04-28 17:22:10,213 - INFO - Чтение JSON-файла: data/categories.json
+2025-04-28 17:22:10,763 - INFO - Чтение JSON-файла: data/apps.json
+2025-04-28 17:22:12,082 - INFO - Чтение JSON-файла: data/categories.json
+2025-04-28 17:22:12,605 - INFO - Чтение JSON-файла: data/apps.json
+2025-04-28 17:22:15,744 - INFO - Чтение JSON-файла: data/categories.json
+2025-04-28 17:22:16,518 - INFO - Чтение JSON-файла: data/apps.json
+2025-04-28 17:22:17,176 - INFO - Чтение JSON-файла: data/categories.json
+2025-04-28 17:22:17,754 - INFO - Чтение JSON-файла: data/apps.json
+2025-04-28 17:22:18,142 - INFO - Чтение JSON-файла: data/categories.json
+2025-04-28 17:22:18,511 - INFO - Чтение JSON-файла: data/apps.json
+2025-04-28 17:22:18,877 - INFO - Чтение JSON-файла: data/categories.json

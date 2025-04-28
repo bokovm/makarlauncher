@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QMessageBox
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QMessageBox, QSizePolicy
 from PyQt6.QtCore import Qt
 import os
 from utils.json_utils import load_json
@@ -14,49 +14,80 @@ class MainMenu(QWidget):
         super().__init__()
         self.switch_callback = switch_callback
         self.admin_auth_callback = admin_auth_callback
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
+        self.current_category = None  # Для отслеживания текущей категории
         self.init_ui()
 
     def init_ui(self):
-        """Инициализация пользовательского интерфейса."""
-        self.layout = QVBoxLayout()
+        """Инициализация интерфейса."""
         self.layout.setSpacing(15)
         self.layout.setContentsMargins(20, 20, 20, 20)
-        self.setLayout(self.layout)
-        self.update_layout()
+        self.show_categories()
 
-    def update_layout(self):
-        """Обновление интерфейса с категориями и приложениями."""
-        # Очищаем текущий layout
+    def show_categories(self):
+        """Отображение списка категорий."""
         self.clear_layout(self.layout)
 
-        # Загружаем категории и приложения
         try:
             categories = load_json("data/categories.json") or []
-            apps = load_json("data/apps.json") or []
         except Exception as e:
-            self.show_message(f"Ошибка загрузки данных: {str(e)}")
+            self.show_message(f"Ошибка загрузки данных категорий: {str(e)}")
             return
 
         if not categories:
             self.show_message("Категории не найдены в JSON-файле.")
             return
 
+        # Заголовок
+        title_label = QLabel("Выберите категорию:")
+        title_label.setStyleSheet("font-size: 20px; color: white;")
+        self.layout.addWidget(title_label)
+
+        # Создание кнопок категорий
         for category in categories:
-            # Добавляем заголовок категории
-            category_label = QLabel(category.get("name", "Без имени"))
-            category_label.setStyleSheet("font-size: 20px; color: white; margin-top: 20px;")
-            self.layout.addWidget(category_label)
+            category_button = QPushButton(category.get("name", "Без имени"))
+            category_button.setStyleSheet("""
+                QPushButton {
+                    font-size: 16px;
+                    background-color: #4CAF50;
+                    color: white;
+                    padding: 10px;
+                    border-radius: 5px;
+                    border: none;
+                    margin-bottom: 10px;
+                }
+                QPushButton:hover {
+                    background-color: #45A049;
+                }
+            """)
+            category_button.clicked.connect(lambda _, c=category: self.show_apps(c))
+            self.layout.addWidget(category_button)
 
-            # Фильтруем приложения по категории
-            category_apps = [app for app in apps if app.get("category_id") == category.get("id")]
+    def show_apps(self, category):
+        """Отображение приложений из выбранной категории."""
+        self.clear_layout(self.layout)
 
-            if not category_apps:
-                empty_label = QLabel("(Нет приложений в категории)")
-                empty_label.setStyleSheet("font-size: 14px; color: gray;")
-                self.layout.addWidget(empty_label)
-                continue
+        # Заголовок категории
+        category_label = QLabel(f"Категория: {category.get('name', 'Без имени')}")
+        category_label.setStyleSheet("font-size: 20px; color: white;")
+        self.layout.addWidget(category_label)
 
-            # Создаем контейнер для приложений
+        try:
+            apps = load_json("data/apps.json") or []
+        except Exception as e:
+            self.show_message(f"Ошибка загрузки данных приложений: {str(e)}")
+            return
+
+        # Фильтруем приложения по категории
+        category_apps = [app for app in apps if app.get("category_id") == category.get("id")]
+
+        if not category_apps:
+            empty_label = QLabel("(Нет приложений в категории)")
+            empty_label.setStyleSheet("font-size: 14px; color: gray;")
+            self.layout.addWidget(empty_label)
+        else:
+            # Создаём кнопки для приложений
             apps_container = QWidget()
             apps_layout = QHBoxLayout()
             apps_layout.setSpacing(10)
@@ -68,9 +99,9 @@ class MainMenu(QWidget):
 
             self.layout.addWidget(apps_container)
 
-        # Кнопка для входа в админ-панель
-        admin_btn = QPushButton("Админ-панель")
-        admin_btn.setStyleSheet("""
+        # Кнопка "Назад"
+        back_button = QPushButton("Назад")
+        back_button.setStyleSheet("""
             QPushButton {
                 font-size: 16px;
                 background-color: #4CAF50;
@@ -78,20 +109,14 @@ class MainMenu(QWidget):
                 padding: 10px;
                 border-radius: 5px;
                 border: none;
+                margin-top: 20px;
             }
             QPushButton:hover {
                 background-color: #45A049;
             }
         """)
-        admin_btn.clicked.connect(self.admin_auth_callback)
-        self.layout.addWidget(admin_btn, alignment=Qt.AlignmentFlag.AlignCenter)
-
-    def clear_layout(self, layout):
-        """Очищает layout от всех виджетов."""
-        while layout.count():
-            child = layout.takeAt(0)
-            if child.widget():
-                child.widget().deleteLater()
+        back_button.clicked.connect(self.show_categories)
+        self.layout.addWidget(back_button)
 
     def create_app_button(self, app):
         """
@@ -107,20 +132,19 @@ class MainMenu(QWidget):
         app_btn = QPushButton(app_name)
         app_btn.setToolTip(app_name)
 
-        # Устанавливаем фиксированный размер для квадратных кнопок
+        # Настройки размеров
+        app_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         if is_square:
             app_btn.setFixedSize(100, 100)
 
         app_btn.setStyleSheet(f"""
             QPushButton {{
-                font-size: 16px;
+                font-size: 14px;
                 background-color: {bg_color};
                 color: white;
-                padding: 10px;
+                padding: 5px;
                 border-radius: {'10px' if is_square else '32px'};
                 border: none;
-                min-width: {'100px' if is_square else '64px'};
-                min-height: {'100px' if is_square else '64px'};
             }}
             QPushButton:hover {{
                 background-color: #5A9BD5;
@@ -149,6 +173,13 @@ class MainMenu(QWidget):
                 self.show_message(f"Не удалось запустить приложение: {str(e)}")
         else:
             self.show_message(f"Приложение не найдено по пути: {path}")
+
+    def clear_layout(self, layout):
+        """Очищает layout от всех виджетов."""
+        while layout.count():
+            child = layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
 
     def show_message(self, message):
         """

@@ -22,119 +22,110 @@ class MainMenu(QWidget):
         self.update_layout()
 
     def update_layout(self):
-        """Обновление интерфейса с категориями и приложениями"""
+        """Обновление интерфейса с категориями и приложениями."""
         # Очищаем текущий layout
-        while self.layout.count():
-            child = self.layout.takeAt(0)
-            if child.widget():
-                child.widget().deleteLater()
-
-        # Добавляем заголовок
-        title = QLabel("Главное меню")
-        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("font-size: 24px; font-weight: bold; color: white;")
-        self.layout.addWidget(title)
+        self.clear_layout(self.layout)
 
         # Загружаем категории и приложения
         try:
-            with sqlite3.connect('launcher.db') as conn:
-                c = conn.cursor()
+            categories = load_json("data/categories.json") or []
+            apps = load_json("data/apps.json") or []
+        except Exception as e:
+            self.show_message(f"Ошибка загрузки данных: {str(e)}")
+            return
 
-                # Получаем категории
-                c.execute("SELECT id, name, icon_path FROM categories ORDER BY sort_order")
-                categories = c.fetchall()
+        if not categories:
+            self.show_message("Категории не найдены в JSON-файле.")
+            return
 
-                if not categories:
-                    self.show_message("Категории не найдены в базе данных.")
-                    return
+        for category in categories:
+            # Добавляем заголовок категории
+            category_label = QLabel(category.get("name", "Без имени"))
+            category_label.setStyleSheet("font-size: 20px; color: white; margin-top: 20px;")
+            self.layout.addWidget(category_label)
 
-                for cat_id, cat_name, cat_icon in categories:
-                    # Добавляем заголовок категории
-                    category_label = QLabel(cat_name)
-                    category_label.setStyleSheet("font-size: 20px; color: white; margin-top: 20px;")
-                    self.layout.addWidget(category_label)
+            # Фильтруем приложения по категории
+            category_apps = [app for app in apps if app.get("category_id") == category.get("id")]
 
-                    # Получаем приложения для этой категории
-                    c.execute("""
-                        SELECT id, name, path, icon_path, bg_color, is_square 
-                        FROM apps 
-                        WHERE category_id=? 
-                        ORDER BY name
-                    """, (cat_id,))
-                    apps = c.fetchall()
+            if not category_apps:
+                empty_label = QLabel("(Нет приложений в категории)")
+                empty_label.setStyleSheet("font-size: 14px; color: gray;")
+                self.layout.addWidget(empty_label)
+                continue
 
-                    # Если в категории нет приложений
-                    if not apps:
-                        empty_label = QLabel(f"(Нет приложений в категории)")
-                        empty_label.setStyleSheet("font-size: 14px; color: gray;")
-                        self.layout.addWidget(empty_label)
-                        continue
+            # Создаем контейнер для приложений
+            apps_container = QWidget()
+            apps_layout = QHBoxLayout()
+            apps_layout.setSpacing(10)
+            apps_layout.setContentsMargins(0, 10, 0, 10)  # Отступы для кнопок
+            apps_container.setLayout(apps_layout)
 
-                    # Создаем контейнер для приложений
-                    apps_container = QWidget()
-                    apps_layout = QHBoxLayout()
-                    apps_layout.setSpacing(10)
-                    apps_container.setLayout(apps_layout)
+            for app in category_apps:
+                app_btn = self.create_app_button(app)
+                apps_layout.addWidget(app_btn)
 
-                    for app_id, app_name, app_path, app_icon, bg_color, is_square in apps:
-                        app_btn = self.create_app_button(app_name, app_path, app_icon, bg_color, is_square)
-                        apps_layout.addWidget(app_btn)
+            self.layout.addWidget(apps_container)
 
-                    self.layout.addWidget(apps_container)
+            # Добавляем разделитель между категориями
+            spacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+            self.layout.addItem(spacer)
 
-        except sqlite3.Error as e:
-            self.show_message(f"Ошибка работы с базой данных: {e}")
-
-        # Добавляем кнопку админ-панели
+        # Кнопка для входа в админ-панель
         admin_btn = QPushButton("Админ-панель")
         admin_btn.setStyleSheet("""
             QPushButton {
-                background-color: rgba(180, 70, 70, 0.85);
-                color: white;
                 font-size: 16px;
+                background-color: #4CAF50;
+                color: white;
                 padding: 10px;
                 border-radius: 5px;
-                margin-top: 30px;
+                border: none;
             }
             QPushButton:hover {
-                background-color: rgba(200, 90, 90, 0.9);
+                background-color: #45A049;
             }
         """)
-        admin_btn.clicked.connect(self.main_window.show_admin_panel)
+        admin_btn.clicked.connect(self.admin_auth_callback)
         self.layout.addWidget(admin_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.layout.addStretch()
+    def create_app_button(self, app):
+        """
+        Создает кнопку для приложения.
+        :param app: Словарь с данными приложения (name, path, icon_path, bg_color, is_square).
+        :return: QPushButton
+        """
+        app_name = app.get("name", "Без имени")
+        app_path = app.get("path", "")
+        bg_color = app.get("bg_color", "#4682B4")
+        is_square = app.get("is_square", False)
 
-    def create_app_button(self, app_name, app_path, app_icon, bg_color, is_square):
-        """Создает кнопку для приложения"""
-        app_btn = QPushButton()
+        app_btn = QPushButton(app_name)
         app_btn.setToolTip(app_name)
 
-        # Настройка внешнего вида кнопки
-        if app_icon and os.path.exists(app_icon):
-            icon = QIcon(app_icon)
-            app_btn.setIcon(icon)
-            app_btn.setIconSize(QSize(64, 64))
+        # Изменяем размер кнопки для адаптации
+        if is_square:
+            app_btn.setMinimumSize(80, 80)  # Минимальный размер кнопки
+            app_btn.setMaximumSize(150, 150)  # Максимальный размер кнопки
+        else:
+            app_btn.setMinimumHeight(64)  # Минимальная высота для не квадратных кнопок
+
+        app_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
 
         app_btn.setStyleSheet(f"""
             QPushButton {{
-                background-color: {bg_color if bg_color else 'rgba(70, 130, 180, 0.85)'};
+                font-size: 16px;
+                background-color: {bg_color};
+                color: white;
+                padding: 10px;
                 border-radius: {'10px' if is_square else '32px'};
-                min-width: 80px;
-                min-height: 80px;
                 border: none;
             }}
             QPushButton:hover {{
-                background-color: {bg_color if bg_color else 'rgba(90, 150, 200, 0.9)'};
+                background-color: #5A9BD5;
             }}
         """)
 
-        # Обработчик клика
-        if app_path.startswith(('http://', 'https://')):
-            app_btn.clicked.connect(lambda _, p=app_path: webbrowser.open(p))
-        else:
-            app_btn.clicked.connect(lambda _, p=app_path: self.launch_app(p))
-
+        app_btn.clicked.connect(lambda _, p=app_path: self.launch_app(p))
         return app_btn
 
     def launch_app(self, path):
