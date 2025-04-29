@@ -88,20 +88,26 @@ class AdminLoginDialog(QDialog):
 
 
 class AuthController:
-    """Контроллер для управления аутентификацией"""
+    """Контроллер для управления аутентификацией (JSON версия)"""
+
     def __init__(self, json_path: str = None):
         self.json_file = json_path or resource_path("data/admins.json")
         self._init_json()
 
     def _init_json(self):
         """Инициализация файла JSON для хранения администраторов"""
-        admins = load_json(self.json_file)
-        if admins is None:
-            # Если файл отсутствует или пустой, создается администратор по умолчанию
-            admins = []
-            self.create_admin("admin", "admin123")
-        elif not admins:
-            # Если файл пуст (например, "[]"), создается администратор по умолчанию
+        try:
+            admins = load_json(self.json_file)
+            if admins is None:
+                # Если файл отсутствует или пустой, создаем администратора по умолчанию
+                admins = []
+                self.create_admin("admin", "admin123")
+            elif not admins:
+                # Если файл пуст (например, "[]"), создаем администратора по умолчанию
+                self.create_admin("admin", "admin123")
+        except Exception as e:
+            print(f"Ошибка при инициализации JSON: {e}")
+            # Создаем файл заново с администратором по умолчанию
             self.create_admin("admin", "admin123")
 
     @staticmethod
@@ -116,8 +122,8 @@ class AuthController:
             'sha256',
             password.encode('utf-8'),
             salt.encode('utf-8'),
-            100000,  # Количество итераций
-            dklen=128  # Длина ключа
+            100000,
+            dklen=128
         ).hex()
 
     def create_admin(self, username: str, password: str) -> bool:
@@ -126,30 +132,38 @@ class AuthController:
             return False
 
         admins = load_json(self.json_file) or []
-        if any(admin["username"] == username for admin in admins):
-            return False  # Администратор с таким именем уже существует
 
+        # Проверяем существование администратора
+        if any(admin["username"] == username for admin in admins):
+            return False
+
+        # Создаем нового администратора
         salt = self._generate_salt()
         hashed_password = self._hash_password(password, salt)
 
-        admins.append({
+        new_admin = {
             "username": username,
             "password": hashed_password,
             "salt": salt,
             "is_active": True
-        })
+        }
+
+        admins.append(new_admin)
         save_json(self.json_file, admins)
         return True
 
     def authenticate(self, username: str, password: str) -> bool:
         """Аутентификация администратора"""
         admins = load_json(self.json_file) or []
+
         for admin in admins:
             if admin["username"] == username and admin["is_active"]:
+                # Проверяем пароль
                 salt = admin["salt"]
                 stored_hash = admin["password"]
                 input_hash = self._hash_password(password, salt)
                 return secrets.compare_digest(stored_hash, input_hash)
+
         return False
 
     def change_password(self, username: str, current_password: str, new_password: str) -> bool:
@@ -158,14 +172,21 @@ class AuthController:
             return False
 
         admins = load_json(self.json_file) or []
+
         for admin in admins:
             if admin["username"] == username:
+                # Генерируем новую соль и хеш
                 salt = self._generate_salt()
                 new_hashed = self._hash_password(new_password, salt)
+
+                # Обновляем данные
                 admin["password"] = new_hashed
                 admin["salt"] = salt
+
+                # Сохраняем изменения
                 save_json(self.json_file, admins)
                 return True
+
         return False
 
     def get_admin_count(self) -> int:

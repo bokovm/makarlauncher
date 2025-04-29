@@ -1,6 +1,6 @@
-from PyQt6.QtWidgets import QDialog, QFormLayout, QLineEdit, QPushButton, QMessageBox
-import sqlite3
+import json
 import hashlib
+from PyQt6.QtWidgets import QDialog, QFormLayout, QLineEdit, QPushButton, QMessageBox
 
 
 class ChangePasswordDialog(QDialog):
@@ -9,6 +9,7 @@ class ChangePasswordDialog(QDialog):
         self.setWindowTitle("Изменение пароля")
         self.setFixedSize(300, 200)
 
+        # Создание интерфейса
         layout = QFormLayout()
 
         self.old_pass_input = QLineEdit()
@@ -33,7 +34,32 @@ class ChangePasswordDialog(QDialog):
 
         self.setLayout(layout)
 
+    def load_admin_password(self):
+        """Загрузить текущий хэш пароля администратора из JSON"""
+        try:
+            with open("settings.json", "r", encoding="utf-8") as file:
+                settings = json.load(file)
+                return settings.get("admin_password")
+        except (FileNotFoundError, json.JSONDecodeError):
+            QMessageBox.critical(self, "Ошибка", "Не удалось загрузить настройки.")
+            return None
+
+    def save_admin_password(self, new_password_hash):
+        """Сохранить обновленный хэш пароля администратора в JSON"""
+        try:
+            with open("settings.json", "r", encoding="utf-8") as file:
+                settings = json.load(file)
+
+            settings["admin_password"] = new_password_hash
+
+            with open("settings.json", "w", encoding="utf-8") as file:
+                json.dump(settings, file, indent=4)
+
+        except (FileNotFoundError, json.JSONDecodeError):
+            QMessageBox.critical(self, "Ошибка", "Не удалось сохранить настройки.")
+
     def change_password(self):
+        """Логика изменения пароля администратора"""
         old_pass = self.old_pass_input.text()
         new_pass = self.new_pass_input.text()
         confirm_pass = self.confirm_pass_input.text()
@@ -46,21 +72,20 @@ class ChangePasswordDialog(QDialog):
             QMessageBox.warning(self, "Ошибка", "Новый пароль и подтверждение не совпадают!")
             return
 
-        conn = sqlite3.connect('launcher.db')
-        c = conn.cursor()
-        c.execute("SELECT admin_password FROM settings WHERE id=1")
-        db_password = c.fetchone()[0]
-
-        old_hash = hashlib.sha256(old_pass.encode()).hexdigest()
-        if old_hash != db_password:
-            QMessageBox.warning(self, "Ошибка", "Неверный текущий пароль!")
-            conn.close()
+        # Загрузка текущего хэша пароля из JSON
+        current_password_hash = self.load_admin_password()
+        if current_password_hash is None:
             return
 
+        # Проверка текущего пароля
+        old_hash = hashlib.sha256(old_pass.encode()).hexdigest()
+        if old_hash != current_password_hash:
+            QMessageBox.warning(self, "Ошибка", "Неверный текущий пароль!")
+            return
+
+        # Хэширование нового пароля и сохранение его в JSON
         new_hash = hashlib.sha256(new_pass.encode()).hexdigest()
-        c.execute("UPDATE settings SET admin_password=? WHERE id=1", (new_hash,))
-        conn.commit()
-        conn.close()
+        self.save_admin_password(new_hash)
 
         QMessageBox.information(self, "Успех", "Пароль успешно изменен!")
         self.accept()

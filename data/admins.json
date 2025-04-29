@@ -1,18 +1,8 @@
 [
     {
-        "username": "makar",
-        "password": "50897118",
-        "salt": "randomsalt123",
-        "is_active": true,
-        "is_admin": true,
-        "created_at": "2023-11-20"
-    },
-    {
         "username": "admin",
-        "password": "50897118",
-        "salt": "abcd1234efgh5678",
-        "is_active": true,
-        "is_admin": true,
-        "created_at": "2023-11-20"
+        "password": "425b8becb3308719c5796917093e25f7582cdb7fbb0dfb078501dff5285680eb53f59585ce7809a4275bceba06e88c6a45de7a6414ec1b303f9cd62d244753d0e0a11fbfcc6c49deeb2b7dd1af5aafc25d74274e2d91ba2f1534beb611954d076746755a28089b1eece825071de8c5b6857c46c3886810712d11e4768200b775",
+        "salt": "f90ef88d0b526703ec5fb8198afcd104f2ae712523cdd7d25bc7ac0896a7531d",
+        "is_active": true
     }
 ]

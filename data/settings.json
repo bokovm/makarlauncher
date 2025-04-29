@@ -1,5 +1,6 @@
 {
     "background_image": "assets/background.jpg",
-    "theme": "light",
-    "other_settings": {}
+    "background_color": "#cc00ff",
+    "opacity": 0.9,
+    "font_family": "Arial"
 }

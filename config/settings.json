@@ -1,5 +1,5 @@
 {
-    "theme": "dark",
-    "language": "ru",
-    "auto_update": true
+    "admin_password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbddf9419f5ea9a3f727e",  // хэш "password"
+    "background_image": "assets/background.jpg",
+    "theme": "light"
 }

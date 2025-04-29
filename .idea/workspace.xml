@@ -5,7 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="66f2fbe2-d00f-4196-a358-65946562d888" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/admin/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/views/dialogs/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/admin/views/dialogs/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/views/dialogs/category.py" beforeDir="false" afterPath="$PROJECT_DIR$/admin/views/dialogs/category.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/config/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/admins.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/admins.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/settings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/launcher.log" beforeDir="false" afterPath="$PROJECT_DIR$/launcher.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sqlite3.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/main_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/main_window.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
