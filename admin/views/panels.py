@@ -7,7 +7,7 @@ from PyQt6.QtGui import QColor
 from PyQt6.QtCore import Qt
 from .dialogs.auth import ChangePasswordDialog
 from .dialogs.category import CategoryEditor
-from .dialogs.app import AppEditor
+from .dialogs.app import main
 
 
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTabWidget, QMessageBox, QDialog

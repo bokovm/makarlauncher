@@ -11,7 +11,7 @@ from ui.browser_menu import BrowserMenu
 from ui.games_menu import GamesMenu
 from ui.chat_menu import ChatMenu
 from ui.settings_menu import SettingsMenu
-from admin.auth import AdminLoginDialog
+from admin.auth import AdminLoginDialog, AuthController
 from admin.views.panels import AdminPanel
 
 
@@ -29,7 +29,8 @@ class Launcher(QWidget):
 
         # Инициализация атрибутов
         self.stack = stacked_widget
-        self.admin_panel = None  # Будет инициализировано при первом входе
+        self.auth_controller = AuthController()  # Добавлен контроллер аутентификации
+        self.admin_panel = None
         self.admin_button = QPushButton()
         self.toggle_button = QPushButton()
         self.menus = {}
@@ -181,12 +182,9 @@ class Launcher(QWidget):
         return QIcon()
 
     def show_admin_auth(self):
-        """
-        Показывает диалог авторизации администратора
-        """
+        """Показывает диалог авторизации администратора"""
         try:
-            # Вызываем авторизацию только здесь
-            dialog = AdminLoginDialog(self)
+            dialog = AdminLoginDialog(self.auth_controller, self)  # Передаем auth_controller
             if dialog.exec() == QDialog.DialogCode.Accepted:
                 if self.admin_panel is None:
                     self.admin_panel = AdminPanel(self)

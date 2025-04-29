@@ -1,14 +1,17 @@
 [
     {
         "id": 1,
-        "name": "Игры"
+        "name": "Утилиты",
+        "icon_path": "icons/utilities.png"
     },
     {
         "id": 2,
-        "name": "Утилиты"
+        "name": "Игры",
+        "icon_path": "assets/icons/game.jpg"
     },
     {
         "id": 3,
-        "name": "Браузеры"
+        "name": "Программирование",
+        "icon_path": "icons/programming.png"
     }
 ]

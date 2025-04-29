@@ -5,10 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="66f2fbe2-d00f-4196-a358-65946562d888" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/db_handler.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/user_management.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/launcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/launcher.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/views/dialogs/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/admin/views/dialogs/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/views/panels.py" beforeDir="false" afterPath="$PROJECT_DIR$/admin/views/panels.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/apps.json" beforeDir="false" afterPath="$PROJECT_DIR$/config/apps.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/categories.json" beforeDir="false" afterPath="$PROJECT_DIR$/config/categories.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/config/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/categories.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/categories.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/launcher.log" beforeDir="false" afterPath="$PROJECT_DIR$/launcher.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/components/menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/components/menu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/main_menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/main_menu.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -37,8 +44,9 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Python.app.executor": "Run",
     "Python.launcher.executor": "Run",
-    "Python.main.executor": "Run",
+    "Python.main.executor": "Debug",
     "Python.main_menu.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
@@ -50,6 +58,9 @@
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Makar\PycharmProjects\makarlauncher\data" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Makar\PycharmProjects\makarlauncher" />
     </key>
   </component>
   <component name="SharedIndexes">

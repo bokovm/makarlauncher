@@ -7,7 +7,7 @@
     {
         "id": 2,
         "name": "Игры",
-        "icon_path": "icons/games.png"
+        "icon_path": "assets/icons/game.jpg"
     },
     {
         "id": 3,

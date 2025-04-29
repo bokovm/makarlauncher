@@ -1,5 +1,6 @@
+from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QMessageBox, QSizePolicy
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QSize
 import os
 from utils.json_utils import load_json
 
@@ -40,27 +41,32 @@ class MainMenu(QWidget):
             return
 
         # Заголовок
-        title_label = QLabel("Выберите категорию:")
-        title_label.setStyleSheet("font-size: 20px; color: white;")
-        self.layout.addWidget(title_label)
+
 
         # Создание кнопок категорий
         for category in categories:
             category_button = QPushButton(category.get("name", "Без имени"))
+
+            # Загрузка изображения для кнопки
+            icon = QIcon(QPixmap("path_to_image.png"))  # Укажите путь к изображению
+            category_button.setIcon(icon)
+            category_button.setIconSize(QSize(32, 32))  # Размер иконки
+
+            # Уменьшение текстового отступа, если нужно
             category_button.setStyleSheet("""
                 QPushButton {
                     font-size: 16px;
-                    background-color: #4CAF50;
-                    color: white;
-                    padding: 10px;
+                    padding: 5px 10px;  /* Уменьшаем padding, если есть иконка */
                     border-radius: 5px;
                     border: none;
                     margin-bottom: 10px;
+                    background-color: transparent;  # Прозрачный фон
                 }
                 QPushButton:hover {
-                    background-color: #45A049;
+                    background-color: rgba(0, 0, 0, 0.1);  # Лёгкий эффект при наведении
                 }
             """)
+
             category_button.clicked.connect(lambda _, c=category: self.show_apps(c))
             self.layout.addWidget(category_button)
 
